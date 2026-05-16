@@ -1,5 +1,7 @@
 # 🐠 Code Aquarium
 
+[![VS Code Marketplace](https://img.shields.io/visual-studio-marketplace/v/arunbrahma.code-aquarium-app)](https://marketplace.visualstudio.com/items?itemName=arunbrahma.code-aquarium-app)
+
 A tiny, living aquarium right inside VS Code. Fish swim, bubbles drift, and the tank quietly comes alive while you code.
 
 Code Aquarium is an ambient companion - a little pocket of calm in your editor. Add a few fish, give them names, and watch them swim, nap, chase food, and react to your day. Pet one whenever you need a smile.

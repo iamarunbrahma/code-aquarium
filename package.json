@@ -1,5 +1,5 @@
 {
-    "name": "code-aquarium",
+    "name": "code-aquarium-app",
     "displayName": "Code Aquarium",
     "description": "A cozy pixel aquarium for VS Code where fish react to your saves, commits, and idle time.",
     "version": "0.0.1",
