@@ -1,0 +1,755 @@
+:root {
+    --water-tint-top: #1ea0bf;
+    --water-tint-mid: #0e7896;
+    --water-tint-bottom: #064f6a;
+    --light-level: 1;
+    --day-night: 1;
+}
+
+html,
+body {
+    height: 100%;
+    width: 100%;
+    overflow: hidden;
+    margin: 0;
+}
+
+body {
+    background:
+        /* Sun-shaft glow at top */
+        radial-gradient(
+            ellipse at 50% -10%,
+            rgba(255, 230, 170, 0.18) 0%,
+            transparent 45%
+        ),
+        /* Floor warm wash */
+            radial-gradient(
+                ellipse at 50% 110%,
+                rgba(255, 200, 120, 0.1) 0%,
+                transparent 55%
+            ),
+        /* Main water column */
+            linear-gradient(
+                to bottom,
+                var(--water-tint-top) 0%,
+                var(--water-tint-mid) 55%,
+                var(--water-tint-bottom) 100%
+            );
+    position: relative;
+    filter: brightness(calc(var(--light-level) * var(--day-night)));
+    transition: filter 800ms ease;
+    cursor: crosshair;
+}
+
+#tankCanvasContainer,
+#background,
+#decorContainer,
+#fishContainer,
+#foreground {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+}
+
+#background {
+    z-index: 0;
+}
+
+/* ============================================================
+   Water surface — animated wavy gradient at the very top
+   simulating sunlight breaking through the surface.
+   ============================================================ */
+.water-surface {
+    position: absolute;
+    top: 0;
+    left: -10%;
+    right: -10%;
+    height: 22%;
+    pointer-events: none;
+    background:
+        radial-gradient(
+            ellipse 60% 100% at 20% 0%,
+            rgba(255, 245, 200, 0.25) 0%,
+            transparent 60%
+        ),
+        radial-gradient(
+            ellipse 50% 100% at 60% 0%,
+            rgba(255, 245, 200, 0.18) 0%,
+            transparent 55%
+        ),
+        radial-gradient(
+            ellipse 70% 100% at 85% 0%,
+            rgba(255, 245, 200, 0.22) 0%,
+            transparent 60%
+        );
+    mix-blend-mode: screen;
+    animation: surfaceDrift 11s ease-in-out infinite alternate;
+}
+
+@keyframes surfaceDrift {
+    from {
+        transform: translateX(-3%) skewX(-1deg);
+        opacity: 0.85;
+    }
+    to {
+        transform: translateX(3%) skewX(1deg);
+        opacity: 1;
+    }
+}
+
+/* Layered light rays — three shafts beaming downward at slight angles */
+#background::before {
+    content: '';
+    position: absolute;
+    inset: -20% 0 0 0;
+    background:
+        linear-gradient(
+            100deg,
+            transparent 35%,
+            rgba(255, 240, 200, 0.09) 45%,
+            transparent 55%
+        ),
+        linear-gradient(
+            80deg,
+            transparent 60%,
+            rgba(255, 240, 200, 0.07) 70%,
+            transparent 78%
+        ),
+        linear-gradient(
+            110deg,
+            transparent 15%,
+            rgba(255, 240, 200, 0.06) 25%,
+            transparent 35%
+        );
+    background-size:
+        200% 200%,
+        200% 200%,
+        200% 200%;
+    animation: lightRays 14s ease-in-out infinite alternate;
+    pointer-events: none;
+    mix-blend-mode: screen;
+}
+
+#background::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background:
+        radial-gradient(
+            circle at 30% 20%,
+            rgba(255, 255, 255, 0.07) 0%,
+            transparent 30%
+        ),
+        radial-gradient(
+            circle at 70% 30%,
+            rgba(255, 255, 255, 0.05) 0%,
+            transparent 35%
+        );
+    animation: caustic 9s ease-in-out infinite alternate;
+    pointer-events: none;
+    mix-blend-mode: screen;
+}
+
+@keyframes lightRays {
+    from {
+        background-position:
+            0% 0%,
+            100% 0%,
+            50% 0%;
+        opacity: 0.7;
+    }
+    to {
+        background-position:
+            100% 0%,
+            0% 0%,
+            0% 0%;
+        opacity: 1;
+    }
+}
+
+@keyframes caustic {
+    from {
+        transform: translate(-2%, -1%) scale(1);
+        opacity: 0.6;
+    }
+    to {
+        transform: translate(2%, 1%) scale(1.05);
+        opacity: 1;
+    }
+}
+
+/* ============================================================
+   Floor caustics — wavy bright spots dancing on the sand.
+   Uses TWO layered radial gradients with offset animations
+   for organic shimmer. mix-blend-mode: screen lifts the light
+   without darkening the sand underneath.
+   ============================================================ */
+.floor-caustics {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: 22%;
+    pointer-events: none;
+    mix-blend-mode: screen;
+    opacity: 0.85;
+    background:
+        radial-gradient(
+            ellipse 18% 60% at 15% 80%,
+            rgba(255, 240, 190, 0.55) 0%,
+            transparent 60%
+        ),
+        radial-gradient(
+            ellipse 16% 60% at 40% 90%,
+            rgba(255, 240, 190, 0.45) 0%,
+            transparent 60%
+        ),
+        radial-gradient(
+            ellipse 20% 60% at 68% 75%,
+            rgba(255, 240, 190, 0.5) 0%,
+            transparent 60%
+        ),
+        radial-gradient(
+            ellipse 14% 60% at 88% 85%,
+            rgba(255, 240, 190, 0.4) 0%,
+            transparent 60%
+        );
+    background-size:
+        100% 100%,
+        100% 100%,
+        100% 100%,
+        100% 100%;
+    animation: floorCaustic 7s ease-in-out infinite alternate;
+    filter: blur(2px);
+}
+
+.floor-caustics-b {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: 22%;
+    pointer-events: none;
+    mix-blend-mode: screen;
+    opacity: 0.6;
+    background:
+        radial-gradient(
+            ellipse 22% 70% at 25% 85%,
+            rgba(180, 230, 255, 0.45) 0%,
+            transparent 60%
+        ),
+        radial-gradient(
+            ellipse 18% 70% at 55% 78%,
+            rgba(180, 230, 255, 0.4) 0%,
+            transparent 60%
+        ),
+        radial-gradient(
+            ellipse 20% 70% at 80% 90%,
+            rgba(180, 230, 255, 0.42) 0%,
+            transparent 60%
+        );
+    animation: floorCausticB 9.5s ease-in-out infinite alternate;
+    filter: blur(3px);
+}
+
+@keyframes floorCaustic {
+    from {
+        transform: translateX(-3%) scaleY(1);
+        opacity: 0.7;
+    }
+    to {
+        transform: translateX(3%) scaleY(1.08);
+        opacity: 1;
+    }
+}
+
+@keyframes floorCausticB {
+    from {
+        transform: translateX(2%) scaleY(0.95);
+        opacity: 0.55;
+    }
+    to {
+        transform: translateX(-2%) scaleY(1.05);
+        opacity: 0.75;
+    }
+}
+
+/* Sand floor — warm gradient anchoring the bottom. */
+.sand-floor {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: 14%;
+    background: linear-gradient(
+        to bottom,
+        rgba(245, 220, 170, 0) 0%,
+        rgba(245, 220, 170, 0.25) 30%,
+        rgba(225, 195, 145, 0.55) 75%,
+        rgba(205, 170, 120, 0.7) 100%
+    );
+    pointer-events: none;
+}
+
+.sand-floor::after {
+    /* Subtle sand grain texture via repeating tiny dots. */
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-image: radial-gradient(
+            circle at 25% 60%,
+            rgba(120, 90, 50, 0.15) 0.5px,
+            transparent 1.2px
+        ),
+        radial-gradient(
+            circle at 60% 80%,
+            rgba(120, 90, 50, 0.15) 0.5px,
+            transparent 1.2px
+        ),
+        radial-gradient(
+            circle at 85% 45%,
+            rgba(120, 90, 50, 0.15) 0.5px,
+            transparent 1.2px
+        );
+    background-size: 7px 7px;
+    pointer-events: none;
+}
+
+/* ============================================================
+   Distant micro-fish — schools drifting across the background.
+   Smaller, slower than mid-tank fish; pure CSS animation.
+   ============================================================ */
+.bg-microfish {
+    position: absolute;
+    width: 14px;
+    height: 6px;
+    background: rgba(255, 255, 255, 0.18);
+    border-radius: 50% 30% 30% 50% / 60% 50% 50% 60%;
+    pointer-events: none;
+    animation: drift linear infinite;
+    filter: blur(0.4px);
+}
+
+.bg-microfish::after {
+    content: '';
+    position: absolute;
+    right: -4px;
+    top: 0;
+    width: 0;
+    height: 0;
+    border-top: 3px solid transparent;
+    border-bottom: 3px solid transparent;
+    border-left: 4px solid rgba(255, 255, 255, 0.18);
+}
+
+@keyframes drift {
+    from {
+        transform: translateX(-120px);
+    }
+    to {
+        transform: translateX(calc(100vw + 120px));
+    }
+}
+
+/* Schoolers — tight little cluster that swims together as one unit. */
+.school {
+    position: absolute;
+    pointer-events: none;
+    animation: drift linear infinite;
+    height: 16px;
+}
+
+.school > .school-fish {
+    position: absolute;
+    width: 8px;
+    height: 4px;
+    background: rgba(255, 255, 255, 0.28);
+    border-radius: 50% 30% 30% 50% / 60% 50% 50% 60%;
+    filter: blur(0.3px);
+}
+
+.school > .school-fish::after {
+    content: '';
+    position: absolute;
+    right: -3px;
+    top: 0;
+    width: 0;
+    height: 0;
+    border-top: 2px solid transparent;
+    border-bottom: 2px solid transparent;
+    border-left: 3px solid rgba(255, 255, 255, 0.28);
+}
+
+/* ============================================================
+   Giant deep silhouette — a whale/manta slowly drifting in the
+   deepest layer. Very low opacity, heavy blur. Adds depth.
+   ============================================================ */
+.deep-silhouette {
+    position: absolute;
+    pointer-events: none;
+    background: rgba(0, 0, 0, 0.25);
+    filter: blur(4px);
+    animation: deepDrift linear infinite;
+}
+
+.deep-silhouette.whale {
+    width: 160px;
+    height: 38px;
+    border-radius: 50% 25% 25% 50% / 70% 50% 50% 70%;
+}
+
+.deep-silhouette.whale::after {
+    content: '';
+    position: absolute;
+    right: -10px;
+    top: 5px;
+    width: 0;
+    height: 0;
+    border-top: 14px solid transparent;
+    border-bottom: 14px solid transparent;
+    border-left: 14px solid rgba(0, 0, 0, 0.25);
+}
+
+@keyframes deepDrift {
+    from {
+        transform: translateX(-200px);
+    }
+    to {
+        transform: translateX(calc(100vw + 200px));
+    }
+}
+
+/* Sand particles drifting lazily upward. */
+.sand-mote {
+    position: absolute;
+    width: 2px;
+    height: 2px;
+    background: rgba(255, 220, 170, 0.4);
+    border-radius: 50%;
+    pointer-events: none;
+    animation: rise linear infinite;
+}
+
+@keyframes rise {
+    from {
+        transform: translateY(0) translateX(0);
+        opacity: 0;
+    }
+    10% {
+        opacity: 1;
+    }
+    90% {
+        opacity: 1;
+    }
+    to {
+        transform: translateY(-100vh) translateX(20px);
+        opacity: 0;
+    }
+}
+
+#tankCanvasContainer {
+    z-index: 1;
+}
+
+#decorContainer {
+    z-index: 2;
+}
+
+#fishContainer {
+    z-index: 3;
+    pointer-events: none;
+}
+
+#foreground {
+    z-index: 4;
+    pointer-events: none;
+}
+
+canvas {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+}
+
+/* ============================================================
+   FISH — interactive, glowy on hover, bouncy when pet.
+   ============================================================ */
+.fish {
+    transition:
+        transform 200ms linear,
+        filter 200ms ease;
+    filter: drop-shadow(0 2px 3px rgba(0, 0, 0, 0.4));
+    pointer-events: auto;
+    cursor: pointer;
+    will-change: left, bottom;
+}
+
+.fish:hover {
+    filter: drop-shadow(0 0 8px rgba(255, 220, 140, 0.85))
+        drop-shadow(0 2px 3px rgba(0, 0, 0, 0.45));
+}
+
+.fish.fish-pet {
+    animation: petBounce 420ms cubic-bezier(0.36, 1.6, 0.56, 0.94);
+}
+
+@keyframes petBounce {
+    0% {
+        transform: scale(1);
+    }
+    40% {
+        transform: scale(1.22) translateY(-6px);
+    }
+    70% {
+        transform: scale(0.95);
+    }
+    100% {
+        transform: scale(1);
+    }
+}
+
+/* ============================================================
+   Pet ring — a rotating conic gradient halo that bursts when
+   a fish is pet. Uses a CSS-only one-shot animation.
+   ============================================================ */
+.pet-ring {
+    position: absolute;
+    pointer-events: none;
+    width: 70px;
+    height: 70px;
+    border-radius: 50%;
+    transform: translate(-50%, 50%);
+    background: conic-gradient(
+        from 0deg,
+        transparent 0%,
+        rgba(255, 220, 140, 0.85) 25%,
+        rgba(255, 180, 220, 0.7) 50%,
+        rgba(180, 230, 255, 0.7) 75%,
+        transparent 100%
+    );
+    mask: radial-gradient(circle, transparent 40%, black 42%, black 50%, transparent 52%);
+    -webkit-mask: radial-gradient(circle, transparent 40%, black 42%, black 50%, transparent 52%);
+    animation: petRing 800ms ease-out forwards;
+    mix-blend-mode: screen;
+}
+
+@keyframes petRing {
+    0% {
+        opacity: 0;
+        transform: translate(-50%, 50%) scale(0.4) rotate(0deg);
+    }
+    20% {
+        opacity: 1;
+    }
+    100% {
+        opacity: 0;
+        transform: translate(-50%, 50%) scale(1.6) rotate(360deg);
+    }
+}
+
+/* ============================================================
+   Heart burst — three little hearts pop out when a fish is pet.
+   ============================================================ */
+.heart {
+    position: absolute;
+    pointer-events: none;
+    width: 14px;
+    height: 14px;
+    color: #ff6b9a;
+    font-size: 14px;
+    line-height: 14px;
+    text-align: center;
+    transform: translate(-50%, -50%);
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.4);
+    animation: heartFloat 1100ms ease-out forwards;
+}
+
+@keyframes heartFloat {
+    0% {
+        opacity: 0;
+        transform: translate(-50%, -50%) scale(0.4);
+    }
+    15% {
+        opacity: 1;
+        transform: translate(-50%, -50%) scale(1.2);
+    }
+    100% {
+        opacity: 0;
+        transform: translate(calc(-50% + var(--dx, 0px)), calc(-150% - 30px))
+            scale(0.7);
+    }
+}
+
+/* ============================================================
+   Speech bubbles
+   ============================================================ */
+.fish-speech {
+    position: absolute;
+    pointer-events: none;
+    background: rgba(255, 255, 255, 0.96);
+    color: #233a55;
+    border-radius: 12px;
+    padding: 4px 10px;
+    font-family:
+        -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    font-size: 11px;
+    font-weight: 600;
+    white-space: nowrap;
+    box-shadow:
+        0 2px 6px rgba(0, 0, 0, 0.25),
+        0 0 0 1px rgba(0, 0, 0, 0.06);
+    transform: translate(-50%, -100%);
+    animation:
+        speechIn 220ms ease-out,
+        speechOut 280ms ease-in 1700ms forwards;
+    z-index: 10;
+}
+
+.fish-speech::after {
+    content: '';
+    position: absolute;
+    bottom: -5px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 0;
+    height: 0;
+    border-left: 5px solid transparent;
+    border-right: 5px solid transparent;
+    border-top: 6px solid rgba(255, 255, 255, 0.96);
+}
+
+@keyframes speechIn {
+    from {
+        opacity: 0;
+        transform: translate(-50%, -90%) scale(0.7);
+    }
+    to {
+        opacity: 1;
+        transform: translate(-50%, -100%) scale(1);
+    }
+}
+
+@keyframes speechOut {
+    from {
+        opacity: 1;
+    }
+    to {
+        opacity: 0;
+        transform: translate(-50%, -110%) scale(0.9);
+    }
+}
+
+/* ============================================================
+   Multi-ring water ripples on tank click — three rings
+   staggered for organic feel.
+   ============================================================ */
+.water-ripple {
+    position: absolute;
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    border: 2px solid rgba(255, 255, 255, 0.7);
+    pointer-events: none;
+    transform: translate(-50%, -50%);
+    animation: ripple 700ms ease-out forwards;
+}
+
+.water-ripple.r2 {
+    animation-delay: 90ms;
+    animation-duration: 750ms;
+    border-color: rgba(180, 230, 255, 0.6);
+}
+
+.water-ripple.r3 {
+    animation-delay: 170ms;
+    animation-duration: 820ms;
+    border-color: rgba(255, 220, 140, 0.55);
+}
+
+@keyframes ripple {
+    from {
+        opacity: 0.95;
+        transform: translate(-50%, -50%) scale(0.4);
+    }
+    to {
+        opacity: 0;
+        transform: translate(-50%, -50%) scale(3.4);
+    }
+}
+
+/* Food pellets */
+.food-pellet {
+    transition: bottom 100ms linear;
+    filter: drop-shadow(0 1px 1px rgba(0, 0, 0, 0.4));
+}
+
+/* ============================================================
+   Decorations — staggered sway timing per type.
+   ============================================================ */
+.decoration {
+    transform-origin: bottom center;
+    animation: sway 6s ease-in-out infinite alternate;
+    will-change: transform;
+    filter: drop-shadow(0 2px 3px rgba(0, 0, 0, 0.35));
+}
+
+.decoration.deco-seaweed {
+    animation: swayTall 3.6s ease-in-out infinite alternate;
+}
+
+.decoration.deco-coral {
+    animation: sway 9s ease-in-out infinite alternate;
+}
+
+.decoration.deco-static {
+    animation: bobble 5s ease-in-out infinite alternate;
+}
+
+@keyframes sway {
+    from {
+        transform: rotate(-3deg);
+    }
+    to {
+        transform: rotate(3deg);
+    }
+}
+
+@keyframes swayTall {
+    from {
+        transform: rotate(-7deg) translateY(0);
+    }
+    to {
+        transform: rotate(7deg) translateY(-2px);
+    }
+}
+
+@keyframes bobble {
+    from {
+        transform: translateY(0);
+    }
+    to {
+        transform: translateY(-2px);
+    }
+}
+
+/* ============================================================
+   Respect reduced motion — disable purely decorative motion.
+   ============================================================ */
+@media (prefers-reduced-motion: reduce) {
+    .water-surface,
+    .floor-caustics,
+    .floor-caustics-b,
+    .bg-microfish,
+    .school,
+    .deep-silhouette,
+    .sand-mote,
+    .decoration,
+    #background::before,
+    #background::after {
+        animation: none !important;
+    }
+}

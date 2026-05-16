@@ -1,0 +1,304 @@
+{
+    "name": "code-aquarium",
+    "displayName": "Code Aquarium",
+    "description": "A cozy pixel aquarium for VS Code where fish react to your saves, commits, and idle time.",
+    "version": "0.0.1",
+    "engines": {
+        "vscode": "^1.75.0"
+    },
+    "l10n": "./l10n",
+    "publisher": "arunbrahma",
+    "categories": [
+        "Other"
+    ],
+    "keywords": [
+        "fish",
+        "aquarium",
+        "pet",
+        "fun",
+        "tamagotchi",
+        "ambient"
+    ],
+    "license": "MIT",
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/iamarunbrahma/code-aquarium.git"
+    },
+    "icon": "icon.png",
+    "activationEvents": [
+        "onStartupFinished"
+    ],
+    "main": "./out/extension/extension.js",
+    "contributes": {
+        "views": {
+            "explorer": [
+                {
+                    "type": "webview",
+                    "id": "codeAquariumView",
+                    "name": "%codeAquarium.panel.title%",
+                    "when": "codeAquarium.position == 'explorer'",
+                    "icon": "media/icons/fish-dark.svg"
+                }
+            ]
+        },
+        "menus": {
+            "view/title": [
+                {
+                    "command": "codeAquarium.add-fish",
+                    "when": "view == codeAquariumView",
+                    "group": "navigation@1"
+                },
+                {
+                    "command": "codeAquarium.feed",
+                    "when": "view == codeAquariumView",
+                    "group": "navigation@2"
+                },
+                {
+                    "command": "codeAquarium.release-fish",
+                    "when": "view == codeAquariumView",
+                    "group": "navigation@3"
+                }
+            ]
+        },
+        "commands": [
+            {
+                "command": "codeAquarium.add-fish",
+                "title": "%codeAquarium.add-fish.title%",
+                "category": "Code Aquarium",
+                "icon": {
+                    "dark": "media/icons/add-dark.svg",
+                    "light": "media/icons/add-light.svg"
+                }
+            },
+            {
+                "command": "codeAquarium.feed",
+                "title": "%codeAquarium.feed.title%",
+                "category": "Code Aquarium",
+                "icon": {
+                    "dark": "media/icons/feed-dark.svg",
+                    "light": "media/icons/feed-light.svg"
+                }
+            },
+            {
+                "command": "codeAquarium.clean-tank",
+                "title": "%codeAquarium.clean-tank.title%",
+                "category": "Code Aquarium"
+            },
+            {
+                "command": "codeAquarium.release-fish",
+                "title": "%codeAquarium.release-fish.title%",
+                "category": "Code Aquarium",
+                "icon": {
+                    "dark": "media/icons/trash-dark.svg",
+                    "light": "media/icons/trash-light.svg"
+                }
+            },
+            {
+                "command": "codeAquarium.release-all",
+                "title": "%codeAquarium.release-all.title%",
+                "category": "Code Aquarium"
+            },
+            {
+                "command": "codeAquarium.roll-call",
+                "title": "%codeAquarium.roll-call.title%",
+                "category": "Code Aquarium"
+            },
+            {
+                "command": "codeAquarium.change-theme",
+                "title": "%codeAquarium.change-theme.title%",
+                "category": "Code Aquarium"
+            },
+            {
+                "command": "codeAquarium.show-achievements",
+                "title": "%codeAquarium.show-achievements.title%",
+                "category": "Code Aquarium"
+            }
+        ],
+        "configuration": [
+            {
+                "properties": {
+                    "codeAquarium.species": {
+                        "type": "string",
+                        "enum": [
+                            "goldfish",
+                            "tropical",
+                            "pufferfish",
+                            "shark",
+                            "octopus",
+                            "crab"
+                        ],
+                        "default": "goldfish",
+                        "description": "%codeAquarium.species.description%",
+                        "scope": "window",
+                        "enumItemLabels": [
+                            "%codeAquarium.species.goldfish%",
+                            "%codeAquarium.species.tropical%",
+                            "%codeAquarium.species.pufferfish%",
+                            "%codeAquarium.species.shark%",
+                            "%codeAquarium.species.octopus%",
+                            "%codeAquarium.species.crab%"
+                        ]
+                    },
+                    "codeAquarium.color": {
+                        "type": "string",
+                        "enum": [
+                            "orange",
+                            "white",
+                            "black",
+                            "calico",
+                            "blue",
+                            "yellow",
+                            "red",
+                            "pink",
+                            "gray"
+                        ],
+                        "default": "orange",
+                        "description": "%codeAquarium.color.description%",
+                        "scope": "window",
+                        "enumItemLabels": [
+                            "%codeAquarium.color.orange%",
+                            "%codeAquarium.color.white%",
+                            "%codeAquarium.color.black%",
+                            "%codeAquarium.color.calico%",
+                            "%codeAquarium.color.blue%",
+                            "%codeAquarium.color.yellow%",
+                            "%codeAquarium.color.red%",
+                            "%codeAquarium.color.pink%",
+                            "%codeAquarium.color.gray%"
+                        ]
+                    },
+                    "codeAquarium.size": {
+                        "type": "string",
+                        "enum": [
+                            "nano",
+                            "small",
+                            "medium",
+                            "large"
+                        ],
+                        "default": "small",
+                        "description": "%codeAquarium.size.description%",
+                        "enumItemLabels": [
+                            "%codeAquarium.size.nano%",
+                            "%codeAquarium.size.small%",
+                            "%codeAquarium.size.medium%",
+                            "%codeAquarium.size.large%"
+                        ]
+                    },
+                    "codeAquarium.theme": {
+                        "type": "string",
+                        "enum": [
+                            "coral-reef",
+                            "deep-sea",
+                            "sunken-ship"
+                        ],
+                        "default": "coral-reef",
+                        "description": "%codeAquarium.theme.description%",
+                        "enumItemLabels": [
+                            "%codeAquarium.theme.coral-reef%",
+                            "%codeAquarium.theme.deep-sea%",
+                            "%codeAquarium.theme.sunken-ship%"
+                        ]
+                    },
+                    "codeAquarium.position": {
+                        "type": "string",
+                        "enum": [
+                            "panel",
+                            "explorer"
+                        ],
+                        "default": "explorer",
+                        "description": "%codeAquarium.position.description%",
+                        "enumItemLabels": [
+                            "%codeAquarium.position.panel%",
+                            "%codeAquarium.position.explorer%"
+                        ]
+                    },
+                    "codeAquarium.reactToCoding": {
+                        "type": "boolean",
+                        "default": true,
+                        "description": "%codeAquarium.reactToCoding.description%"
+                    },
+                    "codeAquarium.commitsPerHatch": {
+                        "type": "number",
+                        "default": 1,
+                        "minimum": 1,
+                        "maximum": 20,
+                        "description": "%codeAquarium.commitsPerHatch.description%"
+                    },
+                    "codeAquarium.idleTimeoutMinutes": {
+                        "type": "number",
+                        "default": 5,
+                        "minimum": 0,
+                        "maximum": 120,
+                        "description": "%codeAquarium.idleTimeoutMinutes.description%"
+                    },
+                    "codeAquarium.dayNightCycle": {
+                        "type": "boolean",
+                        "default": true,
+                        "description": "%codeAquarium.dayNightCycle.description%"
+                    },
+                    "codeAquarium.errorsTintWater": {
+                        "type": "boolean",
+                        "default": false,
+                        "description": "%codeAquarium.errorsTintWater.description%"
+                    },
+                    "codeAquarium.errorTintThreshold": {
+                        "type": "number",
+                        "default": 10,
+                        "minimum": 1,
+                        "description": "%codeAquarium.errorTintThreshold.description%"
+                    },
+                    "codeAquarium.disableEffects": {
+                        "type": "boolean",
+                        "default": false,
+                        "description": "%codeAquarium.disableEffects.description%"
+                    },
+                    "codeAquarium.maxFish": {
+                        "type": "number",
+                        "default": 15,
+                        "minimum": 1,
+                        "maximum": 50,
+                        "description": "%codeAquarium.maxFish.description%"
+                    }
+                }
+            }
+        ]
+    },
+    "scripts": {
+        "vscode:prepublish": "npm run compile",
+        "compile:panel": "webpack",
+        "compile:extension": "tsc -p ./tsconfig.extension.json",
+        "compile:test": "tsc -p ./tsconfig.test.json",
+        "compile": "npm run compile:panel && npm run compile:extension && npm run compile:test",
+        "watch": "webpack && tsc -watch -p ./tsconfig.extension.json",
+        "lint": "eslint src --ext ts && prettier --check src",
+        "lint:fix": "eslint src --ext ts --fix && prettier --write src",
+        "pretest": "npm run compile && npm run lint",
+        "test": "node ./out/test/runTest.js"
+    },
+    "devDependencies": {
+        "@types/chai": "^4.3.0",
+        "@types/glob": "^7.1.3",
+        "@types/jsdom": "^20.0.0",
+        "@types/mocha": "^9.1.1",
+        "@types/node": "^20.0.0",
+        "@types/vscode": "~1.75.0",
+        "@typescript-eslint/eslint-plugin": "^5.29.0",
+        "@typescript-eslint/parser": "^5.29.0",
+        "@vscode/test-electron": "^2.3.0",
+        "chai": "^4.3.7",
+        "eslint": "^8.18.0",
+        "eslint-plugin-unused-imports": "^2.0.0",
+        "glob": "^8.0.3",
+        "jsdom": "^20.0.0",
+        "jsdom-global": "^3.0.2",
+        "mocha": "^10.8.2",
+        "prettier": "^2.8.8",
+        "ts-loader": "^9.3.0",
+        "typescript": "^4.7.4",
+        "webpack": "^5.95.0",
+        "webpack-cli": "^4.10.0"
+    },
+    "dependencies": {
+        "@vscode/l10n": "^0.0.10"
+    }
+}

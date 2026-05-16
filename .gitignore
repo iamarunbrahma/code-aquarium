@@ -1,0 +1,18 @@
+out
+dist
+build
+node_modules
+
+# Keep shared VS Code extension-dev configs; ignore personal editor settings
+.vscode/*
+!.vscode/launch.json
+!.vscode/tasks.json
+!.vscode/extensions.json
+.vscode-test/
+*.vsix
+.build-out/
+coverage/
+.nyc_output/
+.idea/
+media/main-bundle.js
+.DS_Store

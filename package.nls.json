@@ -1,0 +1,55 @@
+{
+    "codeAquarium.panel.title": "Code Aquarium",
+
+    "codeAquarium.add-fish.title": "Add Fish",
+    "codeAquarium.feed.title": "Feed Fish",
+    "codeAquarium.clean-tank.title": "Clean Tank",
+    "codeAquarium.release-fish.title": "Release Fish",
+    "codeAquarium.release-all.title": "Release All Fish",
+    "codeAquarium.roll-call.title": "Roll Call",
+    "codeAquarium.change-theme.title": "Change Theme",
+    "codeAquarium.show-achievements.title": "Show Achievements",
+
+    "codeAquarium.species.description": "Default fish species",
+    "codeAquarium.color.description": "Default fish color",
+    "codeAquarium.size.description": "Tank and fish scale",
+    "codeAquarium.theme.description": "Tank theme",
+    "codeAquarium.position.description": "Where the aquarium lives in the editor",
+    "codeAquarium.reactToCoding.description": "Aquarium reacts to file saves, commits, and idle time",
+    "codeAquarium.commitsPerHatch.description": "Hatch a new fish every N commits",
+    "codeAquarium.idleTimeoutMinutes.description": "Dim the tank lights after this many minutes idle (0 disables)",
+    "codeAquarium.dayNightCycle.description": "Tint the tank based on system clock",
+    "codeAquarium.errorsTintWater.description": "Opt-in: tint water and disturb fish on high diagnostic counts",
+    "codeAquarium.errorTintThreshold.description": "Minimum diagnostic error count to trigger storm",
+    "codeAquarium.disableEffects.description": "Disable ambient bubble and sparkle effects",
+    "codeAquarium.maxFish.description": "Maximum fish allowed in the tank",
+
+    "codeAquarium.species.goldfish": "Goldfish",
+    "codeAquarium.species.tropical": "Tropical Fish",
+    "codeAquarium.species.pufferfish": "Pufferfish",
+    "codeAquarium.species.shark": "Shark",
+    "codeAquarium.species.octopus": "Octopus",
+    "codeAquarium.species.crab": "Crab",
+
+    "codeAquarium.color.orange": "Orange",
+    "codeAquarium.color.white": "White",
+    "codeAquarium.color.black": "Black",
+    "codeAquarium.color.calico": "Calico",
+    "codeAquarium.color.blue": "Blue",
+    "codeAquarium.color.yellow": "Yellow",
+    "codeAquarium.color.red": "Red",
+    "codeAquarium.color.pink": "Pink",
+    "codeAquarium.color.gray": "Gray",
+
+    "codeAquarium.size.nano": "Nano",
+    "codeAquarium.size.small": "Small",
+    "codeAquarium.size.medium": "Medium",
+    "codeAquarium.size.large": "Large",
+
+    "codeAquarium.theme.coral-reef": "Coral Reef",
+    "codeAquarium.theme.deep-sea": "Deep Sea",
+    "codeAquarium.theme.sunken-ship": "Sunken Ship",
+
+    "codeAquarium.position.panel": "Panel",
+    "codeAquarium.position.explorer": "Explorer"
+}

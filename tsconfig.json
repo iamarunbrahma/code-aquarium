@@ -1,0 +1,10 @@
+{
+    "compilerOptions": {
+        "noImplicitAny": true,
+        "strictNullChecks": true,
+        "outDir": "./.build-out",
+        "lib": ["es2020", "dom"],
+        "target": "esnext"
+    },
+    "include": ["src"]
+}

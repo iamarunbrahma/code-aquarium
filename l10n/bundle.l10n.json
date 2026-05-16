@@ -1,0 +1,21 @@
+{
+    "Pick a species": "Pick a species",
+    "Pick a color": "Pick a color",
+    "Pick a theme": "Pick a theme",
+    "Pick a fish to release": "Pick a fish to release",
+    "Name your new fish": "Name your new fish",
+    "Cancelled": "Cancelled",
+    "No fish in the tank yet": "No fish in the tank yet",
+    "Achievement unlocked": "Achievement unlocked",
+    "Tank cleaned": "Tank cleaned",
+    "Released {0}": "Released {0}",
+    "All fish released": "All fish released",
+    "Added {0} the {1}": "Added {0} the {1}",
+    "Tank is at capacity": "Tank is at capacity",
+    "Aquarium exported": "Aquarium exported",
+    "Aquarium imported": "Aquarium imported",
+    "Imported {0} fish": "Imported {0} fish",
+    "Import failed: invalid JSON": "Import failed: invalid JSON",
+    "Locked": "Locked",
+    "Unlocked": "Unlocked"
+}
