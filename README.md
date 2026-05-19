@@ -1,6 +1,9 @@
 # 🐠 Code Aquarium
 
-[![VS Code Marketplace](https://img.shields.io/visual-studio-marketplace/v/arunbrahma.code-aquarium-app)](https://marketplace.visualstudio.com/items?itemName=arunbrahma.code-aquarium-app)
+[![VS Code Marketplace](https://img.shields.io/badge/VS%20Code-Marketplace-007ACC?logo=visualstudiocode&logoColor=white)](https://marketplace.visualstudio.com/items?itemName=arunbrahma.code-aquarium-app)
+[![License](https://img.shields.io/github/license/iamarunbrahma/code-aquarium)](LICENSE)
+[![Stars](https://img.shields.io/github/stars/iamarunbrahma/code-aquarium?style=flat)](https://github.com/iamarunbrahma/code-aquarium)
+[![Last commit](https://img.shields.io/github/last-commit/iamarunbrahma/code-aquarium)](https://github.com/iamarunbrahma/code-aquarium/commits)
 
 A tiny, living aquarium right inside VS Code. Fish swim, bubbles drift, and the tank quietly comes alive while you code.
 

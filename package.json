@@ -2,7 +2,7 @@
     "name": "code-aquarium-app",
     "displayName": "Code Aquarium",
     "description": "A cozy pixel aquarium for VS Code where fish react to your saves, commits, and idle time.",
-    "version": "0.0.1",
+    "version": "0.0.2",
     "engines": {
         "vscode": "^1.75.0"
     },
@@ -15,9 +15,14 @@
         "fish",
         "aquarium",
         "pet",
+        "pets",
+        "virtual pet",
+        "desktop pet",
         "fun",
         "tamagotchi",
-        "ambient"
+        "ambient",
+        "cozy",
+        "relax"
     ],
     "license": "MIT",
     "repository": {
