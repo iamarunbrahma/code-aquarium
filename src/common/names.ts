@@ -24,6 +24,36 @@ export const GOLDFISH_NAMES: ReadonlyArray<string> = [
     'Caviar',
     'Reef',
     'Pearl',
+    'Amber',
+    'Clementine',
+    'Marigold',
+    'Saffron',
+    'Honey',
+    'Butterscotch',
+    'Apricot',
+    'Penny',
+    'Copper',
+    'Ginger',
+    'Goldilocks',
+    'Sunbeam',
+    'Marmalade',
+    'Peaches',
+    'Cheddar',
+    'Custard',
+    'Dandelion',
+    'Buttercup',
+    'Citrus',
+    'Mandarin',
+    'Goldwyn',
+    'Flicker',
+    'Shimmer',
+    'Glint',
+    'Topaz',
+    'Sol',
+    'Blaze',
+    'Ember',
+    'Autumn',
+    'Maple',
 ];
 
 export const TROPICAL_NAMES: ReadonlyArray<string> = [
@@ -39,9 +69,44 @@ export const TROPICAL_NAMES: ReadonlyArray<string> = [
     'Indigo',
     'Sherbet',
     'Punch',
-    'Mango',
     'Maui',
     'Calypso',
+    'Fiji',
+    'Coco',
+    'Kiwi',
+    'Papaya',
+    'Guava',
+    'Bali',
+    'Aqua',
+    'Jade',
+    'Teal',
+    'Violet',
+    'Sunset',
+    'Hibiscus',
+    'Lulu',
+    'Mojito',
+    'Zest',
+    'Prism',
+    'Cyan',
+    'Magenta',
+    'Fuchsia',
+    'Tahiti',
+    'Samba',
+    'Limeade',
+    'Mai Tai',
+    'Conch',
+    'Parrot',
+    'Tiki',
+    'Breeze',
+    'Sorbet',
+    'Pineapple',
+    'Dragonfruit',
+    'Lychee',
+    'Passion',
+    'Bermuda',
+    'Cabana',
+    'Trinidad',
+    'Rio',
 ];
 
 export const PUFFERFISH_NAMES: ReadonlyArray<string> = [
@@ -55,6 +120,46 @@ export const PUFFERFISH_NAMES: ReadonlyArray<string> = [
     'Mochi',
     'Pumpkin',
     'Yuzu',
+    'Dumpling',
+    'Biscuit',
+    'Muffin',
+    'Pudding',
+    'Bao',
+    'Gumball',
+    'Nugget',
+    'Truffle',
+    'Wasabi',
+    'Blowfish',
+    'Sumo',
+    'Roly',
+    'Doughnut',
+    'Meatball',
+    'Cushion',
+    'Bubblegum',
+    'Niblet',
+    'Macaron',
+    'Tater',
+    'Butterbean',
+    'Puffles',
+    'Globe',
+    'Orb',
+    'Pillow',
+    'Pom-Pom',
+    'Dollop',
+    'Squish',
+    'Pufferoni',
+    'Cottonball',
+    'Snowball',
+    'Dim Sum',
+    'Croissant',
+    'Brioche',
+    'Wonton',
+    'Edamame',
+    'Gnocchi',
+    'Pierogi',
+    'Ravioli',
+    'Pufford',
+    'Puffy',
 ];
 
 export const SHARK_NAMES: ReadonlyArray<string> = [
@@ -66,8 +171,48 @@ export const SHARK_NAMES: ReadonlyArray<string> = [
     'Bane',
     'Ripper',
     'Bigsby',
-    'Reef',
+    'Mako',
     'Stormy',
+    'Fang',
+    'Razor',
+    'Brutus',
+    'Hammer',
+    'Diesel',
+    'Titan',
+    'Shadow',
+    'Maverick',
+    'Goliath',
+    'Cyclone',
+    'Sabre',
+    'Crusher',
+    'Vortex',
+    'Bolt',
+    'Rogue',
+    'Apex',
+    'Nitro',
+    'Tank',
+    'Slate',
+    'Grizzle',
+    'Reaper',
+    'Onyx',
+    'Cleaver',
+    'Talon',
+    'Rumble',
+    'Gnash',
+    'Dagger',
+    'Carcharo',
+    'Hunter',
+    'Spear',
+    'Riptide',
+    'Maw',
+    'Predator',
+    'Boulder',
+    'Tempest',
+    'Savage',
+    'Bandit',
+    'Wrecker',
+    'Thresher',
+    'Hammerhead',
 ];
 
 export const OCTOPUS_NAMES: ReadonlyArray<string> = [
@@ -81,6 +226,46 @@ export const OCTOPUS_NAMES: ReadonlyArray<string> = [
     'Limber',
     'Noodle',
     'Marbles',
+    'Wiggles',
+    'Octo',
+    'Inkling',
+    'Squiggle',
+    'Tako',
+    'Kraken',
+    'Cephalo',
+    'Bendy',
+    'Octavius',
+    'Curly',
+    'Twirl',
+    'Slinky',
+    'Coil',
+    'Wriggle',
+    'Splotch',
+    'Ringo',
+    'Gloop',
+    'Tangle',
+    'Pickles',
+    'Gizmo',
+    'Octopia',
+    'Suckerpunch',
+    'Squirt',
+    'Blot',
+    'Smudge',
+    'Loop',
+    'Twist',
+    'Spiral',
+    'Octopie',
+    'Wobble',
+    'Squelch',
+    'Rubbery',
+    'Goopy',
+    'Octavian',
+    'Tentaculo',
+    'Inkwell',
+    'Davy',
+    'Ozzy',
+    'Wiggly',
+    'Octobot',
 ];
 
 export const CRAB_NAMES: ReadonlyArray<string> = [
@@ -94,10 +279,50 @@ export const CRAB_NAMES: ReadonlyArray<string> = [
     'Cancer',
     'Cap',
     'Pippa',
+    'Snippy',
+    'Clawdia',
+    'Crabby',
+    'Shelly',
+    'Sandy',
+    'Nipper',
+    'Scuttle',
+    'Pincer',
+    'Clamps',
+    'Rocky',
+    'Digger',
+    'Clawson',
+    'Crabigail',
+    'Chip',
+    'Barnacle',
+    'Tide',
+    'Driftwood',
+    'Molty',
+    'Scuttlebug',
+    'Claws',
+    'Snappy',
+    'Pinchers',
+    'Crustacean',
+    'Coconut',
+    'Shells',
+    'Sandcastle',
+    'Crabcake',
+    'Bisque',
+    'Marsh',
+    'Skitter',
+    'Clawford',
+    'Crabzilla',
+    'Pebbles',
+    'Hardshell',
+    'Ironclaw',
+    'Crawdad',
+    'Lagoona',
+    'Clawrence',
+    'Sheldon',
+    'Crabsworth',
 ];
 
-export function randomName(species: FishSpecies): string {
-    const collection =
+export function namesFor(species: FishSpecies): ReadonlyArray<string> {
+    return (
         (
             {
                 [FishSpecies.goldfish]: GOLDFISH_NAMES,
@@ -107,6 +332,42 @@ export function randomName(species: FishSpecies): string {
                 [FishSpecies.octopus]: OCTOPUS_NAMES,
                 [FishSpecies.crab]: CRAB_NAMES,
             } as Record<FishSpecies, ReadonlyArray<string>>
-        )[species] ?? GOLDFISH_NAMES;
-    return collection[Math.floor(Math.random() * collection.length)] ?? 'Fishy';
+        )[species] ?? GOLDFISH_NAMES
+    );
+}
+
+export function randomName(species: FishSpecies): string {
+    const pool = namesFor(species);
+    return pool[Math.floor(Math.random() * pool.length)] ?? 'Fishy';
+}
+
+/** Appends the lowest free numeric suffix if `base` is taken (e.g. "Nemo 2"). */
+export function uniquify(base: string, taken: ReadonlyArray<string>): string {
+    const used = new Set(taken);
+    if (!used.has(base)) {
+        return base;
+    }
+    let n = 2;
+    while (used.has(`${base} ${n}`)) {
+        n++;
+    }
+    return `${base} ${n}`;
+}
+
+/**
+ * A name for a new fish that does not collide with `taken`. The species pools
+ * are sized to the maximum tank size (see the name-pools test), so a free
+ * same-species name is always available. The suffix is only a defensive guard
+ * for the impossible case where every pool name is somehow already taken.
+ */
+export function uniqueName(
+    species: FishSpecies,
+    taken: ReadonlyArray<string>,
+): string {
+    const used = new Set(taken);
+    const free = namesFor(species).filter((name) => !used.has(name));
+    if (free.length === 0) {
+        return uniquify(randomName(species), taken);
+    }
+    return free[Math.floor(Math.random() * free.length)];
 }

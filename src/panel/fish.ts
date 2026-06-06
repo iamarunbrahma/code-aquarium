@@ -16,6 +16,13 @@ import {
     traitSpeedMultiplier,
 } from './personality';
 import { decayNeeds, exertionForState, moodFor } from './needs';
+import {
+    TANK_FLOOR,
+    bandFor,
+    chaseClamp,
+    isFloorDweller,
+    roamClamp,
+} from './movement';
 
 export interface FishElementState {
     name: string;
@@ -187,6 +194,9 @@ export abstract class BaseFish {
 
     /** Late initializer called by subclass once `sequence` is assigned. */
     public init(): void {
+        this._baseSpeed = this._speed;
+        // Start the fish inside its species' vertical band.
+        this._bottom = roamClamp(this.species, this._bottom);
         this.setState(this.sequence.startingState);
         this.applyTransform();
     }
@@ -411,6 +421,7 @@ export abstract class BaseFish {
                 const sign = state === FishState.swimRight ? 1 : -1;
                 fish._vx = sign * fish._speed;
                 fish._vy = (Math.random() - 0.5) * 0.05;
+                const [floor, ceil] = bandFor(fish.species);
                 return {
                     nextFrame: () => {
                         fish._left += fish._vx;
@@ -423,12 +434,12 @@ export abstract class BaseFish {
                             fish._left = 92;
                             return FrameResult.stateComplete;
                         }
-                        if (fish._bottom < 10) {
-                            fish._bottom = 10;
+                        if (fish._bottom < floor) {
+                            fish._bottom = floor;
                             fish._vy = Math.abs(fish._vy);
                         }
-                        if (fish._bottom > 85) {
-                            fish._bottom = 85;
+                        if (fish._bottom > ceil) {
+                            fish._bottom = ceil;
                             fish._vy = -Math.abs(fish._vy);
                         }
                         return FrameResult.stateContinue;
@@ -440,7 +451,10 @@ export abstract class BaseFish {
                 fish._vy = 0;
                 return {
                     nextFrame: () => {
-                        fish._bottom += Math.sin(fish.age * 0.1) * 0.05;
+                        fish._bottom = roamClamp(
+                            fish.species,
+                            fish._bottom + Math.sin(fish.age * 0.1) * 0.05,
+                        );
                         return FrameResult.stateContinue;
                     },
                 };
@@ -450,7 +464,10 @@ export abstract class BaseFish {
                 return {
                     nextFrame: () => {
                         fish._left = clamp(fish._left + fish._vx, 4, 92);
-                        fish._bottom = clamp(fish._bottom + fish._vy, 10, 85);
+                        fish._bottom = roamClamp(
+                            fish.species,
+                            fish._bottom + fish._vy,
+                        );
                         return FrameResult.stateContinue;
                     },
                 };
@@ -469,7 +486,10 @@ export abstract class BaseFish {
                 fish._vy = -0.02;
                 return {
                     nextFrame: () => {
-                        fish._bottom = Math.max(10, fish._bottom + fish._vy);
+                        fish._bottom = Math.max(
+                            TANK_FLOOR,
+                            fish._bottom + fish._vy,
+                        );
                         return FrameResult.stateContinue;
                     },
                 };
@@ -489,10 +509,10 @@ export abstract class BaseFish {
                 return {
                     nextFrame: () => {
                         fish._left = clamp(fish._left + fish._vx, 4, 92);
-                        fish._bottom += fish._vy;
-                        if (fish._bottom > 85) {
-                            fish._bottom = 15;
-                        }
+                        fish._bottom = roamClamp(
+                            fish.species,
+                            fish._bottom + fish._vy,
+                        );
                         return FrameResult.stateContinue;
                     },
                 };
@@ -500,11 +520,12 @@ export abstract class BaseFish {
             case FishState.walkLeft: {
                 const sign = state === FishState.walkRight ? 1 : -1;
                 fish._vx = sign * fish._speed * 0.4;
-                fish._bottom = 10;
                 fish._vy = 0;
                 return {
                     nextFrame: () => {
                         fish._left += fish._vx;
+                        // Ease down onto the sand rather than snapping to it.
+                        fish._bottom += (TANK_FLOOR - fish._bottom) * 0.25;
                         if (fish._left <= 4) {
                             fish._left = 4;
                             return FrameResult.stateComplete;
@@ -525,12 +546,26 @@ export abstract class BaseFish {
     }
 
     protected moveToward(targetLeft: number, targetBottom: number): void {
+        // Floor-dwellers (crabs) pursue food horizontally along the sand and
+        // wait for it to sink, rather than swimming up to it.
+        if (isFloorDweller(this.species)) {
+            const dir = targetLeft < this._left ? -1 : 1;
+            this._left += dir * this._speed * 2;
+            this._bottom = TANK_FLOOR;
+            this.el.style.transform = dir < 0 ? 'scaleX(-1)' : 'scaleX(1)';
+            return;
+        }
         const dx = targetLeft - this._left;
         const dy = targetBottom - this._bottom;
         const dist = Math.hypot(dx, dy) || 1;
         const speed = this._speed * 2;
         this._left += (dx / dist) * speed;
-        this._bottom += (dy / dist) * speed;
+        // Descend toward a sunken pellet if needed, but never rise above the
+        // species' band ceiling.
+        this._bottom = chaseClamp(
+            this.species,
+            this._bottom + (dy / dist) * speed,
+        );
         if (dx < 0) {
             this.el.style.transform = 'scaleX(-1)';
         } else {

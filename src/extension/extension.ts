@@ -9,7 +9,7 @@ import {
     ITankStats,
     TankTheme,
 } from '../common/types';
-import { randomName } from '../common/names';
+import { uniqueName, uniquify } from '../common/names';
 import { stringListAsQuickPickItemList } from '../common/localize';
 import {
     getConfiguredColor,
@@ -39,6 +39,7 @@ import { DevReactionWatcher } from './devReactionWatcher';
 import { ACHIEVEMENTS, Achievement, AchievementTracker } from './achievements';
 import { rewardAction } from './achievementReward';
 import { randomFishSpec } from './randomFish';
+import { StormController } from './stormController';
 
 let viewProvider: AquariumViewProvider;
 let gitWatcher: GitWatcher;
@@ -181,7 +182,10 @@ async function hatchAchievementReward(
         panel?.celebrate();
         return;
     }
-    const spec = randomFishSpec(getConfiguredSize());
+    const spec = randomFishSpec(
+        getConfiguredSize(),
+        collection.map((f) => f.name),
+    );
     collection.push(spec);
     await storeCollectionAsMemento(context, collection);
     panel?.hatchFish(spec);
@@ -226,7 +230,8 @@ async function addFishFlow(context: vscode.ExtensionContext): Promise<void> {
     if (!color) {
         return;
     }
-    const suggested = randomName(species);
+    const taken = collection.map((f) => f.name);
+    const suggested = uniqueName(species, taken);
     const name = await vscode.window.showInputBox({
         value: suggested,
         prompt: vscode.l10n.t('Name your new fish'),
@@ -234,7 +239,7 @@ async function addFishFlow(context: vscode.ExtensionContext): Promise<void> {
     if (name === undefined) {
         return;
     }
-    const finalName = name.trim() || suggested;
+    const finalName = uniquify(name.trim() || suggested, taken);
     const spec = new FishSpecification(
         species,
         color,
@@ -486,7 +491,10 @@ async function seedStarterFish(
             s.species,
             s.color,
             size,
-            randomName(s.species),
+            uniqueName(
+                s.species,
+                collection.map((f) => f.name),
+            ),
         );
         spec.initialLeft = s.left;
         spec.initialBottom = s.bottom;
@@ -538,6 +546,12 @@ export async function activate(
     void gitWatcher.start();
     context.subscriptions.push({ dispose: () => gitWatcher.dispose() });
 
+    // Shared so the diagnostics and failed-task triggers don't fight over
+    // the storm: it stays up while either still wants it.
+    const stormController = new StormController((on) =>
+        activePanel()?.setStorm(on),
+    );
+
     activityWatcher = new ActivityWatcher({
         context,
         panel: activePanel,
@@ -549,6 +563,7 @@ export async function activate(
             collection = next;
         },
         defaultSize: getConfiguredSize,
+        storm: stormController,
     });
     activityWatcher.start();
 
@@ -558,6 +573,7 @@ export async function activate(
         achievements,
         stats,
         getCollection: () => collection,
+        storm: stormController,
     });
     devReactionWatcher.start();
 

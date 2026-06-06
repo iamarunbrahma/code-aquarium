@@ -4,6 +4,7 @@ import { AchievementTracker } from './achievements';
 import { FishSpecification, writeStats } from './persistence';
 import { IAquariumPanel } from './AquariumWebviewContainer';
 import { notify } from './notifier';
+import { StormController } from './stormController';
 import { getReactToCoding } from './utils';
 
 export interface DevReactionOptions {
@@ -12,6 +13,7 @@ export interface DevReactionOptions {
     achievements: AchievementTracker;
     stats: ITankStats;
     getCollection: () => FishSpecification[];
+    storm: StormController;
 }
 
 /**
@@ -93,16 +95,12 @@ export class DevReactionWatcher {
     // A short storm that clears itself, so a failed run is felt without
     // leaving the tank permanently gloomy.
     private flashStorm(): void {
-        const panel = this.opts.panel();
-        if (!panel) {
-            return;
-        }
-        panel.setStorm(true);
+        this.opts.storm.set('task', true);
         if (this.stormTimer) {
             clearTimeout(this.stormTimer);
         }
         this.stormTimer = setTimeout(() => {
-            this.opts.panel()?.setStorm(false);
+            this.opts.storm.set('task', false);
             this.stormTimer = undefined;
         }, 4000);
     }

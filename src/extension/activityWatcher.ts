@@ -10,6 +10,7 @@ import {
 import { IAquariumPanel } from './AquariumWebviewContainer';
 import { notify } from './notifier';
 import { randomFishSpec } from './randomFish';
+import { StormController } from './stormController';
 import {
     getCommitsPerHatch,
     getErrorTintThreshold,
@@ -31,6 +32,7 @@ export interface ActivityWatcherOptions {
     getCollection: () => FishSpecification[];
     setCollection: (next: FishSpecification[]) => void;
     defaultSize: () => FishSize;
+    storm: StormController;
 }
 
 /**
@@ -40,7 +42,6 @@ export interface ActivityWatcherOptions {
  */
 export class ActivityWatcher {
     private idleTimer: NodeJS.Timeout | undefined;
-    private storm = false;
     private lightsDimmed = false;
     private lastActivity: number = Date.now();
     private pendingHatches = 0;
@@ -110,7 +111,10 @@ export class ActivityWatcher {
             if (collection.length >= getMaxFish()) {
                 break;
             }
-            const spec = randomFishSpec(this.opts.defaultSize());
+            const spec = randomFishSpec(
+                this.opts.defaultSize(),
+                collection.map((f) => f.name),
+            );
             collection.push(spec);
             this.opts.stats.totalCommitHatches += 1;
             hatched += 1;
@@ -172,10 +176,7 @@ export class ActivityWatcher {
 
     private onDiagnostics(): void {
         if (!this.isEnabled() || !getErrorsTintWater()) {
-            if (this.storm) {
-                this.storm = false;
-                this.opts.panel()?.setStorm(false);
-            }
+            this.opts.storm.set('diagnostics', false);
             return;
         }
         let errorCount = 0;
@@ -186,12 +187,10 @@ export class ActivityWatcher {
                 }
             }
         }
-        const threshold = getErrorTintThreshold();
-        const shouldStorm = errorCount >= threshold;
-        if (shouldStorm !== this.storm) {
-            this.storm = shouldStorm;
-            this.opts.panel()?.setStorm(shouldStorm);
-        }
+        this.opts.storm.set(
+            'diagnostics',
+            errorCount >= getErrorTintThreshold(),
+        );
     }
 
     private checkIdle(): void {
