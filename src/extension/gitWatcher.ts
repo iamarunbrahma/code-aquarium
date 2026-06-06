@@ -1,12 +1,24 @@
 import * as vscode from 'vscode';
+import { HeadSnapshot, shouldFirePush } from './pushDetection';
 
 // Minimal subset of the vscode.git API that we rely on.
+interface GitBranch {
+    name?: string;
+    commit?: string;
+    ahead?: number;
+}
+
 interface GitRepository {
     state: {
-        HEAD?: { name?: string; commit?: string };
+        HEAD?: GitBranch;
         onDidChange: (cb: () => void) => vscode.Disposable;
     };
     rootUri: vscode.Uri;
+}
+
+interface PublishEvent {
+    repository: GitRepository;
+    branch?: string;
 }
 
 interface GitApi {
@@ -14,6 +26,7 @@ interface GitApi {
     onDidOpenRepository: (
         cb: (repo: GitRepository) => void,
     ) => vscode.Disposable;
+    onDidPublish?: (cb: (e: PublishEvent) => void) => vscode.Disposable;
 }
 
 interface GitExtensionExports {
@@ -21,21 +34,47 @@ interface GitExtensionExports {
 }
 
 /**
- * Wraps the bundled `vscode.git` extension and emits an event on each
- * new commit observed across any open repository.
+ * Wraps the bundled `vscode.git` extension and emits events for the local
+ * git milestones the tank reacts to: new commits, pushes, and branch
+ * publishes. Push detection is best effort — the API has no push event and
+ * `onDidChange` carries no payload, so a push is inferred when the branch's
+ * "ahead" count collapses to 0 (see pushDetection.ts).
  */
 export class GitWatcher {
-    private listeners: Array<() => void> = [];
-    private lastHead: Map<string, { commit: string; branch?: string }> =
-        new Map();
+    private commitListeners: Array<() => void> = [];
+    private pushListeners: Array<(branch?: string) => void> = [];
+    private publishListeners: Array<(branch?: string) => void> = [];
+    private lastHead: Map<string, HeadSnapshot> = new Map();
     private disposables: vscode.Disposable[] = [];
     private started = false;
 
     public onCommit(cb: () => void): vscode.Disposable {
-        this.listeners.push(cb);
+        this.commitListeners.push(cb);
         return {
             dispose: () => {
-                this.listeners = this.listeners.filter((l) => l !== cb);
+                this.commitListeners = this.commitListeners.filter(
+                    (l) => l !== cb,
+                );
+            },
+        };
+    }
+
+    public onPush(cb: (branch?: string) => void): vscode.Disposable {
+        this.pushListeners.push(cb);
+        return {
+            dispose: () => {
+                this.pushListeners = this.pushListeners.filter((l) => l !== cb);
+            },
+        };
+    }
+
+    public onPublish(cb: (branch?: string) => void): vscode.Disposable {
+        this.publishListeners.push(cb);
+        return {
+            dispose: () => {
+                this.publishListeners = this.publishListeners.filter(
+                    (l) => l !== cb,
+                );
             },
         };
     }
@@ -49,7 +88,7 @@ export class GitWatcher {
             vscode.extensions.getExtension<GitExtensionExports>('vscode.git');
         if (!ext) {
             console.warn(
-                'Code Aquarium: vscode.git extension not available; commit hatches disabled.',
+                'Code Aquarium: vscode.git extension not available; commit/push reactions disabled.',
             );
             return;
         }
@@ -64,45 +103,60 @@ export class GitWatcher {
         this.disposables.push(
             api.onDidOpenRepository((repo) => this.watchRepo(repo)),
         );
+        // A branch publish (first push of a new branch) has a dedicated event.
+        if (api.onDidPublish) {
+            this.disposables.push(
+                api.onDidPublish((e) => {
+                    this.publishListeners.forEach((cb) => cb(e.branch));
+                }),
+            );
+        }
         api.repositories.forEach((repo) => this.watchRepo(repo));
     }
 
     private watchRepo(repo: GitRepository): void {
         const id = repo.rootUri.toString();
+        const snapshot = (): HeadSnapshot => ({
+            commit: repo.state.HEAD?.commit,
+            branch: repo.state.HEAD?.name,
+            ahead: repo.state.HEAD?.ahead,
+        });
         this.disposables.push(
             repo.state.onDidChange(() => {
-                const head = repo.state.HEAD?.commit;
-                const branch = repo.state.HEAD?.name;
+                const next = snapshot();
                 const prev = this.lastHead.get(id);
-                // Treat it as a commit only when the SHA advanced while we
-                // stayed on the same branch. Branch switches and checkouts
-                // also move HEAD but should not hatch a fish.
+                // Commit: the SHA advanced while we stayed on the same branch.
+                // Branch switches and checkouts also move HEAD but must not
+                // hatch a fish.
                 if (
-                    head &&
+                    next.commit &&
                     prev &&
-                    head !== prev.commit &&
-                    branch === prev.branch
+                    next.commit !== prev.commit &&
+                    next.branch === prev.branch
                 ) {
-                    this.listeners.forEach((cb) => cb());
+                    this.commitListeners.forEach((cb) => cb());
                 }
-                if (head) {
-                    this.lastHead.set(id, { commit: head, branch });
+                // Push: the ahead count collapsed to 0 on the same branch.
+                if (prev && shouldFirePush(prev, next)) {
+                    this.pushListeners.forEach((cb) => cb(next.branch));
+                }
+                if (next.commit) {
+                    this.lastHead.set(id, next);
                 }
             }),
         );
-        const head = repo.state.HEAD?.commit;
-        if (head) {
-            this.lastHead.set(id, {
-                commit: head,
-                branch: repo.state.HEAD?.name,
-            });
+        const initial = snapshot();
+        if (initial.commit) {
+            this.lastHead.set(id, initial);
         }
     }
 
     public dispose(): void {
         this.disposables.forEach((d) => d.dispose());
         this.disposables = [];
-        this.listeners = [];
+        this.commitListeners = [];
+        this.pushListeners = [];
+        this.publishListeners = [];
         this.lastHead.clear();
     }
 }

@@ -9,6 +9,13 @@ import {
     horizontalDirectionForState,
     spriteLabelForState,
 } from './states';
+import {
+    FishTrait,
+    ambientLine,
+    traitForName,
+    traitSpeedMultiplier,
+} from './personality';
+import { decayNeeds, exertionForState } from './needs';
 
 export interface FishElementState {
     name: string;
@@ -58,6 +65,19 @@ const SPECIES_SCALE: Record<FishSpecies, number> = {
     [FishSpecies.tropical]: 0.8,
 };
 
+// Fish render smaller when young and grow to full size with age, so a
+// freshly hatched fry visibly grows up. `age` is already persisted, so this
+// needs no extra storage; the scale runs from FRY_SCALE up to 1.0.
+const FRY_SCALE = 0.6;
+const ADULT_AGE = 3000;
+
+function growthFactor(age: number): number {
+    if (age >= ADULT_AGE) {
+        return 1;
+    }
+    return FRY_SCALE + (1 - FRY_SCALE) * (age / ADULT_AGE);
+}
+
 // Shared pool of funny / sarcastic one-liners a fish can blurt when
 // petted. Combined with each species' own `hello` line, so pets feel
 // fresh instead of repeating one static greeting.
@@ -93,6 +113,7 @@ export abstract class BaseFish {
     public happiness: number;
     public energy: number;
     public age: number;
+    public readonly trait: FishTrait;
 
     protected baseAssetUri: string;
     protected el: HTMLImageElement;
@@ -101,6 +122,7 @@ export abstract class BaseFish {
     protected _vx: number;
     protected _vy: number;
     protected _speed: number;
+    protected _baseSpeed: number;
     protected currentState!: IState;
     protected currentStateEnum!: FishState;
     protected stateFramesRemaining: number = 0;
@@ -126,7 +148,9 @@ export abstract class BaseFish {
         this._bottom = opts.initialBottom ?? Math.random() * 60 + 15;
         this._vx = 0;
         this._vy = 0;
-        this._speed = 0.4;
+        this.trait = traitForName(opts.name);
+        this._baseSpeed = 0.4 * traitSpeedMultiplier(this.trait);
+        this._speed = this._baseSpeed;
 
         this.el = document.createElement('img');
         this.el.className = `fish fish-${opts.species} color-${opts.color} size-${opts.size}`;
@@ -142,9 +166,23 @@ export abstract class BaseFish {
         opts.container.appendChild(this.el);
     }
 
-    /** Rendered sprite size: tank size scaled by this species' proportion. */
+    /**
+     * Rendered sprite size: tank size scaled by this species' proportion and
+     * the fish's age-based growth (fry render smaller, adults full size).
+     */
     protected pixelSize(): number {
-        return Math.round(SIZE_PX[this.size] * SPECIES_SCALE[this.species]);
+        return Math.round(
+            SIZE_PX[this.size] *
+                SPECIES_SCALE[this.species] *
+                growthFactor(this.age),
+        );
+    }
+
+    /** Resize the sprite to match current growth as the fish ages. */
+    protected applyGrowth(): void {
+        const px = this.pixelSize();
+        this.el.style.width = `${px}px`;
+        this.el.style.height = `${px}px`;
     }
 
     /** Late initializer called by subclass once `sequence` is assigned. */
@@ -225,6 +263,16 @@ export abstract class BaseFish {
         return line;
     }
 
+    /** An unprompted idle musing, flavoured by personality and time of day. */
+    public ambientSpeak(isNight: boolean): string {
+        return ambientLine(this.trait, isNight);
+    }
+
+    /** Slow the fish right down when the OS asks for reduced motion. */
+    public setCalm(reduced: boolean): void {
+        this._speed = this._baseSpeed * (reduced ? 0.35 : 1);
+    }
+
     public serialize(): FishElementState {
         return {
             name: this.name,
@@ -241,12 +289,27 @@ export abstract class BaseFish {
     }
 
     public nextFrame(): void {
-        // Stat decay (very slow on a 100 ms tick).
+        // Age the fish and decay its needs every ~10s of tick time.
         this.age += 1;
         if (this.age % 100 === 0) {
-            this.hunger = Math.max(0, this.hunger - 1);
-            this.happiness = Math.max(0, this.happiness - 1);
-            this.energy = Math.max(0, this.energy - 1);
+            const updated = decayNeeds(
+                {
+                    hunger: this.hunger,
+                    energy: this.energy,
+                    happiness: this.happiness,
+                },
+                {
+                    species: this.species,
+                    trait: this.trait,
+                    exertion: exertionForState(this.currentStateEnum),
+                },
+            );
+            this.hunger = updated.hunger;
+            this.energy = updated.energy;
+            this.happiness = updated.happiness;
+            if (this.age <= ADULT_AGE) {
+                this.applyGrowth();
+            }
         }
         // Sleep if exhausted.
         if (
@@ -290,7 +353,8 @@ export abstract class BaseFish {
             this.currentStateEnum === FishState.eat ||
             this.currentStateEnum === FishState.sleep
         ) {
-            this.happiness = Math.min(100, this.happiness + 20);
+            // Eating and sleeping restore the underlying needs; happiness
+            // then follows on its own via the emergent wellbeing model.
             if (this.currentStateEnum === FishState.eat) {
                 this.hunger = Math.min(100, this.hunger + 25);
             }

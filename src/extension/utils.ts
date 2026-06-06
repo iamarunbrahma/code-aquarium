@@ -65,6 +65,14 @@ export function getReactToCoding(): boolean {
     return readBool('reactToCoding', true);
 }
 
+export function getNotificationsEnabled(): boolean {
+    return readBool('notifications.enabled', false);
+}
+
+export function getFishChatter(): boolean {
+    return readBool('fishChatter', true);
+}
+
 export function getDayNightCycle(): boolean {
     return readBool('dayNightCycle', true);
 }

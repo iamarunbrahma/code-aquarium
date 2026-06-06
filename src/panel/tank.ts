@@ -1,4 +1,10 @@
-import { FishColor, FishSize, FishSpecies, TankTheme } from '../common/types';
+import {
+    FishColor,
+    FishMood,
+    FishSize,
+    FishSpecies,
+    TankTheme,
+} from '../common/types';
 import { BubbleEmitter } from './bubbles';
 import { renderAmbientLayer, renderDecorations } from './decorations';
 import { SparkleEffect } from './effects/sparkleEffect';
@@ -19,6 +25,7 @@ export interface TankOpts {
     size: FishSize;
     dayNightCycle: boolean;
     disableEffects: boolean;
+    chatter: boolean;
 }
 
 interface ContainerRefs {
@@ -41,22 +48,26 @@ export class Tank {
     private storm: StormEffect;
     private food: FoodSystem;
     private size: FishSize;
-    private lightLevel: 'on' | 'dim' = 'on';
-    private effectsEnabled: boolean;
+    // effectsEnabled is derived: the user's setting AND not reduced-motion.
+    private effectsEnabled = true;
+    private userEffects: boolean;
+    private reducedMotion: boolean;
+    private chatterEnabled: boolean;
 
     constructor(opts: TankOpts) {
         this.opts = opts;
         this.size = opts.size;
-        this.effectsEnabled = !opts.disableEffects;
+        this.userEffects = !opts.disableEffects;
+        this.reducedMotion = prefersReducedMotion();
+        this.chatterEnabled = opts.chatter;
         this.refs = this.resolveContainers();
         this.themeInfo = getThemeInfo(opts.theme);
         this.bubbles = new BubbleEmitter(this.refs.bubbleCanvas);
         this.sparkle = new SparkleEffect(this.refs.fgEffectCanvas);
         this.storm = new StormEffect(this.refs.bgEffectCanvas);
         this.food = new FoodSystem(this.refs.fish);
-        this.bubbles.setEnabled(this.effectsEnabled);
-        this.sparkle.setEnabled(this.effectsEnabled);
-        this.storm.setEnabled(this.effectsEnabled);
+        this.applyEffectsState();
+        this.watchReducedMotion();
     }
 
     public start(): void {
@@ -69,10 +80,11 @@ export class Tank {
 
     /**
      * Periodic ambient delight: every 18-32 seconds, pick a small
-     * surprise - a random fish darts, a sparkle twinkles on a
-     * decoration, or a tiny shooting orb streaks across the deep
-     * background. Keeps the scene feeling alive even when the user
-     * isn't doing anything.
+     * surprise - a fish darts, a fish muses or shows a mood emote, a
+     * sparkle twinkles, or a shooting orb streaks across the deep
+     * background. Keeps the scene feeling alive even when the user isn't
+     * doing anything; respects the effects, chatter, and reduced-motion
+     * gates (see fireSurprise).
      */
     private installIdleSurprises(): void {
         const schedule = () => {
@@ -86,20 +98,40 @@ export class Tank {
     }
 
     private fireSurprise(): void {
+        // Reduced motion calms the tank entirely; effects and chatter are
+        // each independently switchable.
+        if (this.reducedMotion) {
+            return;
+        }
         const roll = Math.random();
-        if (roll < 0.5 && this.fish.length > 0) {
+        const haveFish = this.fish.length > 0;
+        if (roll < 0.3 && haveFish && this.effectsEnabled) {
             // Random fish gets startled.
-            const f = this.fish[Math.floor(Math.random() * this.fish.length)];
-            f.dart();
-        } else if (roll < 0.8) {
+            this.randomFish().dart();
+        } else if (roll < 0.55 && haveFish && this.chatterEnabled) {
+            // Idle self-talk: a fish muses to itself.
+            const f = this.randomFish();
+            this.showSpeech(f, f.ambientSpeak(isNightHour()));
+        } else if (roll < 0.72 && haveFish && this.chatterEnabled) {
+            // A gentle mood cue floats over a fish that needs some care.
+            const f = this.randomFish();
+            const glyph = moodGlyph(f.mood());
+            if (glyph) {
+                this.showSpeech(f, glyph);
+            }
+        } else if (roll < 0.88 && this.effectsEnabled) {
             // Sparkle on a random decoration location near the floor.
             const left = 8 + Math.random() * 84;
             const bottom = 6 + Math.random() * 14;
             this.sparkle.burst(left, bottom);
-        } else {
+        } else if (this.effectsEnabled) {
             // Streaking orb in the deep background.
             this.streakOrb();
         }
+    }
+
+    private randomFish(): BaseFish {
+        return this.fish[Math.floor(Math.random() * this.fish.length)];
     }
 
     private streakOrb(): void {
@@ -291,6 +323,7 @@ export class Tank {
             initialBottom,
         });
         fish.init();
+        fish.setCalm(this.reducedMotion);
         this.fish.push(fish);
         return fish;
     }
@@ -339,6 +372,21 @@ export class Tank {
         }
     }
 
+    /**
+     * Celebratory sparkle arc for a git milestone (push/publish). Unlike
+     * cleanTank() it leaves food and storm untouched - it is purely a burst
+     * of delight, and never spawns a fish, so it can fire freely without
+     * touching the tank's population.
+     */
+    public celebrate(): void {
+        this.bubbles.burst();
+        for (let i = 0; i < 6; i++) {
+            const left = 12 + i * 15;
+            const bottom = 30 + Math.random() * 40;
+            this.sparkle.burst(left, bottom);
+        }
+    }
+
     public setTheme(theme: TankTheme): void {
         this.opts.theme = theme;
         this.themeInfo = getThemeInfo(theme);
@@ -353,7 +401,6 @@ export class Tank {
     }
 
     public setLights(level: 'on' | 'dim'): void {
-        this.lightLevel = level;
         document.documentElement.style.setProperty(
             '--light-level',
             level === 'dim' ? '0.45' : '1',
@@ -383,14 +430,57 @@ export class Tank {
     }
 
     public setEffectsEnabled(enabled: boolean): void {
-        this.effectsEnabled = enabled;
-        this.bubbles.setEnabled(enabled);
-        this.sparkle.setEnabled(enabled);
-        this.storm.setEnabled(enabled);
+        this.userEffects = enabled;
+        this.applyEffectsState();
+    }
+
+    public setChatter(enabled: boolean): void {
+        this.chatterEnabled = enabled;
+    }
+
+    private applyEffectsState(): void {
+        this.effectsEnabled = this.userEffects && !this.reducedMotion;
+        this.bubbles.setEnabled(this.effectsEnabled);
+        this.sparkle.setEnabled(this.effectsEnabled);
+        this.storm.setEnabled(this.effectsEnabled);
+    }
+
+    private setReducedMotion(reduced: boolean): void {
+        this.reducedMotion = reduced;
+        this.applyEffectsState();
+        for (const f of this.fish) {
+            f.setCalm(reduced);
+        }
+    }
+
+    private watchReducedMotion(): void {
+        if (typeof window === 'undefined' || !window.matchMedia) {
+            return;
+        }
+        const mq = window.matchMedia('(prefers-reduced-motion: reduce)');
+        mq.addEventListener?.('change', (e) =>
+            this.setReducedMotion(e.matches),
+        );
     }
 
     public serializeFish(): FishElementState[] {
         return this.fish.map((f) => f.serialize());
+    }
+
+    public statsSnapshot(): Array<{
+        name: string;
+        hunger: number;
+        happiness: number;
+        energy: number;
+        mood: string;
+    }> {
+        return this.fish.map((f) => ({
+            name: f.name,
+            hunger: f.hunger,
+            happiness: f.happiness,
+            energy: f.energy,
+            mood: f.mood(),
+        }));
     }
 
     private applyTheme(): void {
@@ -477,6 +567,33 @@ function buildFish(opts: BuildFishOpts): BaseFish {
  * clearly-visible 0.6 in the dead of night - a gentle tint, never a
  * blackout. Drives the `--day-night` CSS variable.
  */
-export function dayNightBrightness(hour: number): number {
+function dayNightBrightness(hour: number): number {
     return 0.8 + 0.2 * Math.sin(((hour - 6) / 24) * Math.PI * 2);
+}
+
+function prefersReducedMotion(): boolean {
+    return (
+        typeof window !== 'undefined' &&
+        !!window.matchMedia &&
+        window.matchMedia('(prefers-reduced-motion: reduce)').matches
+    );
+}
+
+function isNightHour(): boolean {
+    const hour = new Date().getHours();
+    return hour < 6 || hour >= 20;
+}
+
+/** A small emote for a fish that needs attention; empty when it's content. */
+function moodGlyph(mood: FishMood): string {
+    switch (mood) {
+        case FishMood.hungry:
+            return '🍤';
+        case FishMood.tired:
+            return '💤';
+        case FishMood.grumpy:
+            return '😾';
+        default:
+            return '';
+    }
 }

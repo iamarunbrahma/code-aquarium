@@ -1,5 +1,5 @@
 import * as vscode from 'vscode';
-import { ALL_SPECIES, FishColor, FishSize, ITankStats } from '../common/types';
+import { FishSize, ITankStats } from '../common/types';
 import { AchievementTracker } from './achievements';
 import { GitWatcher } from './gitWatcher';
 import {
@@ -8,6 +8,8 @@ import {
     writeStats,
 } from './persistence';
 import { IAquariumPanel } from './AquariumWebviewContainer';
+import { notify } from './notifier';
+import { randomFishSpec } from './randomFish';
 import {
     getCommitsPerHatch,
     getErrorTintThreshold,
@@ -32,8 +34,9 @@ export interface ActivityWatcherOptions {
 }
 
 /**
- * Bridges VS Code activity events (saves, commits, idle, diagnostics)
- * into webview messages so the tank reacts to your coding session.
+ * Bridges VS Code activity events (saves, commits, pushes, publishes,
+ * idle, diagnostics) into webview messages so the tank reacts to your
+ * coding session.
  */
 export class ActivityWatcher {
     private idleTimer: NodeJS.Timeout | undefined;
@@ -64,6 +67,10 @@ export class ActivityWatcher {
             vscode.languages.onDidChangeDiagnostics(() => this.onDiagnostics()),
         );
         this.disposables.push(git.onCommit(() => void this.onCommit()));
+        this.disposables.push(git.onPush((branch) => void this.onPush(branch)));
+        this.disposables.push(
+            git.onPublish((branch) => void this.onPublish(branch)),
+        );
         this.idleTimer = setInterval(() => this.checkIdle(), 30_000);
         // Register disposables so VS Code unwinds them on deactivation.
         context.subscriptions.push({ dispose: () => this.dispose() });
@@ -103,7 +110,7 @@ export class ActivityWatcher {
             if (collection.length >= getMaxFish()) {
                 break;
             }
-            const spec = randomSpec(this.opts.defaultSize());
+            const spec = randomFishSpec(this.opts.defaultSize());
             collection.push(spec);
             this.opts.stats.totalCommitHatches += 1;
             hatched += 1;
@@ -123,6 +130,44 @@ export class ActivityWatcher {
                 collection,
             );
         }
+    }
+
+    private async onPush(branch?: string): Promise<void> {
+        if (!this.isEnabled()) {
+            return;
+        }
+        this.opts.stats.totalPushes += 1;
+        await writeStats(this.opts.context, this.opts.stats);
+        this.opts.panel()?.celebrate();
+        notify(
+            branch
+                ? vscode.l10n.t('Pushed to {0}', branch)
+                : vscode.l10n.t('Pushed to remote'),
+        );
+        await this.opts.achievements.checkAndUnlock(
+            this.opts.stats,
+            this.opts.getCollection(),
+        );
+    }
+
+    private async onPublish(branch?: string): Promise<void> {
+        if (!this.isEnabled()) {
+            return;
+        }
+        // Publishing a branch is also its first push to the remote.
+        this.opts.stats.totalPushes += 1;
+        this.opts.stats.totalBranchesPublished += 1;
+        await writeStats(this.opts.context, this.opts.stats);
+        this.opts.panel()?.celebrate();
+        notify(
+            branch
+                ? vscode.l10n.t('Published branch {0}', branch)
+                : vscode.l10n.t('Published a new branch'),
+        );
+        await this.opts.achievements.checkAndUnlock(
+            this.opts.stats,
+            this.opts.getCollection(),
+        );
     }
 
     private onDiagnostics(): void {
@@ -186,18 +231,4 @@ export class ActivityWatcher {
         this.disposables.forEach((d) => d.dispose());
         this.disposables = [];
     }
-}
-
-function randomSpec(size: FishSize): FishSpecification {
-    const species = ALL_SPECIES[Math.floor(Math.random() * ALL_SPECIES.length)];
-    const colors = [
-        FishColor.orange,
-        FishColor.white,
-        FishColor.blue,
-        FishColor.yellow,
-        FishColor.red,
-        FishColor.pink,
-    ];
-    const color = colors[Math.floor(Math.random() * colors.length)];
-    return new FishSpecification(species, color, size);
 }

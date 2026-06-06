@@ -123,4 +123,9 @@ export interface ITankStats {
     totalSaves: number;
     totalCommits: number;
     totalCommitHatches: number;
+    totalPushes: number;
+    totalBranchesPublished: number;
+    totalDebugSessions: number;
+    totalTasksPassed: number;
+    totalTasksFailed: number;
 }

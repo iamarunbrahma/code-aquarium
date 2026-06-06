@@ -10,18 +10,23 @@ import { randomName } from '../common/names';
 import { DEFAULT_COLOR, DEFAULT_SPECIES } from './utils';
 
 const KEY_BASE = 'codeAquarium.fish';
-export const KEY_SPECIES = `${KEY_BASE}.species`;
-export const KEY_COLORS = `${KEY_BASE}.colors`;
-export const KEY_NAMES = `${KEY_BASE}.names`;
-export const KEY_HUNGER = `${KEY_BASE}.hunger`;
-export const KEY_HAPPINESS = `${KEY_BASE}.happiness`;
-export const KEY_ENERGY = `${KEY_BASE}.energy`;
-export const KEY_AGE = `${KEY_BASE}.age`;
+const KEY_SPECIES = `${KEY_BASE}.species`;
+const KEY_COLORS = `${KEY_BASE}.colors`;
+const KEY_NAMES = `${KEY_BASE}.names`;
+const KEY_HUNGER = `${KEY_BASE}.hunger`;
+const KEY_HAPPINESS = `${KEY_BASE}.happiness`;
+const KEY_ENERGY = `${KEY_BASE}.energy`;
+const KEY_AGE = `${KEY_BASE}.age`;
 
 const KEY_STATS_BASE = 'codeAquarium.stats';
-export const KEY_STAT_SAVES = `${KEY_STATS_BASE}.totalSaves`;
-export const KEY_STAT_COMMITS = `${KEY_STATS_BASE}.totalCommits`;
-export const KEY_STAT_HATCHES = `${KEY_STATS_BASE}.totalCommitHatches`;
+const KEY_STAT_SAVES = `${KEY_STATS_BASE}.totalSaves`;
+const KEY_STAT_COMMITS = `${KEY_STATS_BASE}.totalCommits`;
+const KEY_STAT_HATCHES = `${KEY_STATS_BASE}.totalCommitHatches`;
+const KEY_STAT_PUSHES = `${KEY_STATS_BASE}.totalPushes`;
+const KEY_STAT_PUBLISHES = `${KEY_STATS_BASE}.totalBranchesPublished`;
+const KEY_STAT_DEBUG = `${KEY_STATS_BASE}.totalDebugSessions`;
+const KEY_STAT_TASKS_PASSED = `${KEY_STATS_BASE}.totalTasksPassed`;
+const KEY_STAT_TASKS_FAILED = `${KEY_STATS_BASE}.totalTasksFailed`;
 
 export const KEY_ACHIEVEMENTS = 'codeAquarium.achievements';
 
@@ -126,6 +131,20 @@ export function readStats(context: vscode.ExtensionContext): ITankStats {
             KEY_STAT_HATCHES,
             0,
         ),
+        totalPushes: context.globalState.get<number>(KEY_STAT_PUSHES, 0),
+        totalBranchesPublished: context.globalState.get<number>(
+            KEY_STAT_PUBLISHES,
+            0,
+        ),
+        totalDebugSessions: context.globalState.get<number>(KEY_STAT_DEBUG, 0),
+        totalTasksPassed: context.globalState.get<number>(
+            KEY_STAT_TASKS_PASSED,
+            0,
+        ),
+        totalTasksFailed: context.globalState.get<number>(
+            KEY_STAT_TASKS_FAILED,
+            0,
+        ),
     };
 }
 
@@ -138,5 +157,19 @@ export async function writeStats(
     await context.globalState.update(
         KEY_STAT_HATCHES,
         stats.totalCommitHatches,
+    );
+    await context.globalState.update(KEY_STAT_PUSHES, stats.totalPushes);
+    await context.globalState.update(
+        KEY_STAT_PUBLISHES,
+        stats.totalBranchesPublished,
+    );
+    await context.globalState.update(KEY_STAT_DEBUG, stats.totalDebugSessions);
+    await context.globalState.update(
+        KEY_STAT_TASKS_PASSED,
+        stats.totalTasksPassed,
+    );
+    await context.globalState.update(
+        KEY_STAT_TASKS_FAILED,
+        stats.totalTasksFailed,
     );
 }

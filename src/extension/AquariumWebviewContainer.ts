@@ -8,6 +8,8 @@ export interface IAquariumPanel {
     removeFish(name: string): void;
     feed(count?: number): void;
     cleanTank(): void;
+    celebrate(): void;
+    startle(): void;
     resetFish(): void;
     hatchFish(spec: FishSpecification): void;
     setLightLevel(level: 'on' | 'dim'): void;
@@ -15,6 +17,7 @@ export interface IAquariumPanel {
     setTheme(theme: TankTheme): void;
     setSize(size: FishSize): void;
     setDisableEffects(disabled: boolean): void;
+    setChatter(enabled: boolean): void;
     setDefaults(species: FishSpecies, color: FishColor): void;
     update(): void;
     dispose(): void;
@@ -30,6 +33,7 @@ export abstract class AquariumWebviewContainer implements IAquariumPanel {
     protected _disableEffects: boolean;
     protected _reactToCoding: boolean;
     protected _dayNightCycle: boolean;
+    protected _chatter: boolean;
     protected _tickIntervalId: NodeJS.Timeout | number | undefined;
 
     constructor(
@@ -41,6 +45,7 @@ export abstract class AquariumWebviewContainer implements IAquariumPanel {
         disableEffects: boolean,
         reactToCoding: boolean,
         dayNightCycle: boolean,
+        chatter: boolean,
     ) {
         this._extensionUri = extensionUri;
         this._species = species;
@@ -50,6 +55,7 @@ export abstract class AquariumWebviewContainer implements IAquariumPanel {
         this._disableEffects = disableEffects;
         this._reactToCoding = reactToCoding;
         this._dayNightCycle = dayNightCycle;
+        this._chatter = chatter;
         this._tickIntervalId = setInterval(() => {
             this.tick();
         }, 100);
@@ -84,6 +90,14 @@ export abstract class AquariumWebviewContainer implements IAquariumPanel {
         });
     }
 
+    public setChatter(enabled: boolean): void {
+        this._chatter = enabled;
+        void this.getWebview().postMessage({
+            command: 'set-chatter',
+            enabled,
+        });
+    }
+
     public addFish(spec: FishSpecification): void {
         void this.getWebview().postMessage({
             command: 'add-fish',
@@ -113,6 +127,14 @@ export abstract class AquariumWebviewContainer implements IAquariumPanel {
 
     public cleanTank(): void {
         void this.getWebview().postMessage({ command: 'clean-tank' });
+    }
+
+    public celebrate(): void {
+        void this.getWebview().postMessage({ command: 'celebrate' });
+    }
+
+    public startle(): void {
+        void this.getWebview().postMessage({ command: 'startle' });
     }
 
     public resetFish(): void {
@@ -190,7 +212,7 @@ export abstract class AquariumWebviewContainer implements IAquariumPanel {
     <div id="fishContainer"></div>
     <div id="foreground"></div>
     <script nonce="${nonce}" src="${scriptUri}"></script>
-    <script nonce="${nonce}">aquariumApp.aquariumPanelApp("${baseAssetUri}", "${this._theme}", "${this._size}", "${this._species}", "${this._color}", ${this._reactToCoding}, ${this._dayNightCycle}, ${this._disableEffects});</script>
+    <script nonce="${nonce}">aquariumApp.aquariumPanelApp("${baseAssetUri}", "${this._theme}", "${this._size}", "${this._species}", "${this._color}", ${this._reactToCoding}, ${this._dayNightCycle}, ${this._disableEffects}, ${this._chatter});</script>
 </body>
 </html>`;
     }

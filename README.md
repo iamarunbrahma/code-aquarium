@@ -18,11 +18,14 @@ Code Aquarium is an ambient companion - a little pocket of calm in your editor. 
 - **It reacts to your coding session:**
   - **Save a file** → food drops in, and the hungry fish chase it down.
   - **Make a git commit** → a brand-new fish hatches with a sparkle.
+  - **Push your work** → the tank erupts in a celebratory sparkle (publishing a new branch counts too).
+  - **Debug or run a build/test** → fish perk up while you debug and celebrate a green run; a failed task stirs a brief storm.
   - **Step away for a while** → the lights gently dim until you're back.
 - **Day & night** - the tank follows your computer's clock: brighter and livelier by day, calm and moody at night.
 - **Pet your fish** - click any fish and it perks up with a happy bounce, a burst of hearts, and a cheeky one-liner (they're a sarcastic bunch).
+- **Every fish has personality** - name-based traits flavour how fast they swim and the little things they say to themselves, they show a mood emote when they need care, and young fish grow up to full size over time.
 - **Little surprises** - every so often a fish darts, a treasure twinkles, or a glowing orb drifts through the deep.
-- **Achievements** - nine to discover, from your First Splash to owning a shark.
+- **Achievements** - twenty-seven to discover, from your First Splash to owning a shark, debugging, and shipping your code.
 - **Your fish follow you** - their names and identities sync across your computers through VS Code Settings Sync.
 
 ---
@@ -68,7 +71,8 @@ Open **Settings** and search for **Code Aquarium** to make the tank your own:
 - **Position** - keep the aquarium in the Explorer sidebar, or give it its own editor tab.
 - **Theme** - Coral Reef, Deep Sea, or Sunken Ship.
 - **Size** - how big the tank and its creatures appear.
-- **React to coding** - turn the save / commit / idle reactions on or off.
+- **React to coding** - turn the save / commit / push / idle reactions on or off.
+- **Notifications** *(optional, off by default)* - show pop-up notifications for commits, pushes, and achievement unlocks. The tank still reacts silently when this is off.
 - **Day/night cycle** - let the tank brighten and dim with the time of day.
 - **Idle timeout** - how many quiet minutes before the lights dim.
 - **Commits per hatch** - how many git commits it takes to hatch a new fish.
@@ -92,6 +96,24 @@ Open **Settings** and search for **Code Aquarium** to make the tank your own:
 | 🌈 Diverse Tank | Have three different species at once. |
 | 🦈 Apex Predator | Own a shark. |
 | 🐙 Octogarden | Own an octopus. |
+| 🌊 Committed | Make 50 git commits. |
+| 🏆 Century Commits | Make 100 git commits. |
+| 🚀 Liftoff | Push to a remote for the first time. |
+| 📦 Shipping It | Push to a remote 25 times. |
+| 🌿 Branch Out | Publish a new branch. |
+| ⌨️ Keyboard Warrior | Save files 250 times. |
+| 💾 Save Scummer | Save files 500 times. |
+| 🌳 Prolific | Make 250 git commits. |
+| 🏛️ Commit Legend | Make 500 git commits. |
+| 🐣 Hatchery | Hatch 10 fish via git commits. |
+| 🛰️ Deploy Machine | Push to a remote 100 times. |
+| 🌲 Branch Manager | Publish 10 branches. |
+| 🐛 Debugger | Start your first debug session. |
+| 🔬 Bug Hunter | Start 25 debug sessions. |
+| 🪲 Exterminator | Start 100 debug sessions. |
+| ✅ It Compiles! | Finish a build or test task successfully. |
+| 🟢 All Green | Finish 50 tasks successfully. |
+| 💥 Embrace Failure | Have a build or test task fail. |
 
 ---
 

@@ -1,91 +1,27 @@
 import * as vscode from 'vscode';
-import { FishSpecies, ITankStats } from '../common/types';
+import { ITankStats } from '../common/types';
 import { FishSpecification, KEY_ACHIEVEMENTS } from './persistence';
+import { ACHIEVEMENTS, Achievement } from './achievementDefs';
+import { notify } from './notifier';
+import { formatAchievementMessage } from './notifyFormat';
 
-export interface Achievement {
-    id: string;
-    title: string;
-    description: string;
-    emoji: string;
-    check: (stats: ITankStats, fish: FishSpecification[]) => boolean;
-}
+export { ACHIEVEMENTS, type Achievement } from './achievementDefs';
 
-// One tick = 100 ms. 7 days in ticks = 7 * 24 * 36000.
-const SEVEN_DAYS_TICKS = 7 * 24 * 36000;
-
-export const ACHIEVEMENTS: ReadonlyArray<Achievement> = [
-    {
-        id: 'first-splash',
-        title: 'First Splash',
-        emoji: '\uD83D\uDCA6',
-        description: 'Add your first fish',
-        check: (_s, f) => f.length >= 1,
-    },
-    {
-        id: 'schools-in',
-        title: "School's In",
-        emoji: '\uD83D\uDC1F',
-        description: 'Have 5 fish in the tank at once',
-        check: (_s, f) => f.length >= 5,
-    },
-    {
-        id: 'feeder',
-        title: 'Feeder Frenzy',
-        emoji: '\uD83C\uDF64',
-        description: 'Save files 50 times',
-        check: (s) => s.totalSaves >= 50,
-    },
-    {
-        id: 'centurion',
-        title: 'Centurion',
-        emoji: '\uD83D\uDCAF',
-        description: 'Save files 100 times',
-        check: (s) => s.totalSaves >= 100,
-    },
-    {
-        id: 'commit-hatch',
-        title: 'Commit Hatcher',
-        emoji: '\uD83E\uDD5A',
-        description: 'Hatch a fish via git commit',
-        check: (s) => s.totalCommitHatches >= 1,
-    },
-    {
-        id: 'old-timer',
-        title: 'Old Timer',
-        emoji: '\u23F3',
-        description: 'Keep a fish alive 7 days',
-        check: (_s, f) => f.some((x) => x.age > SEVEN_DAYS_TICKS),
-    },
-    {
-        id: 'diverse',
-        title: 'Diverse Tank',
-        emoji: '\uD83C\uDF08',
-        description: 'Three different species at once',
-        check: (_s, f) => new Set(f.map((x) => x.species)).size >= 3,
-    },
-    {
-        id: 'apex',
-        title: 'Apex Predator',
-        emoji: '\uD83E\uDD88',
-        description: 'Own a shark',
-        check: (_s, f) => f.some((x) => x.species === FishSpecies.shark),
-    },
-    {
-        id: 'octogarden',
-        title: 'Octogarden',
-        emoji: '\uD83D\uDC19',
-        description: 'Own an octopus',
-        check: (_s, f) => f.some((x) => x.species === FishSpecies.octopus),
-    },
-];
+/** Fired once per newly unlocked achievement (e.g. to hatch a reward fish). */
+export type AchievementReward = () => void | Promise<void>;
 
 export class AchievementTracker {
     private unlocked: Set<string>;
+    private reward?: AchievementReward;
 
     constructor(private context: vscode.ExtensionContext) {
         this.unlocked = new Set(
             context.globalState.get<string[]>(KEY_ACHIEVEMENTS, []),
         );
+    }
+
+    public setRewardHandler(reward: AchievementReward): void {
+        this.reward = reward;
     }
 
     public isUnlocked(id: string): boolean {
@@ -111,11 +47,20 @@ export class AchievementTracker {
             Array.from(this.unlocked),
         );
         for (const a of newlyUnlocked) {
-            void vscode.window.showInformationMessage(
-                `${a.emoji} ${vscode.l10n.t('Achievement unlocked')}: ${
-                    a.title
-                } \u2014 ${a.description}`,
+            // Routed through notify() so unlock toasts obey the opt-in
+            // (codeAquarium.notifications.enabled).
+            notify(
+                formatAchievementMessage(
+                    vscode.l10n.t('Achievement unlocked'),
+                    a.emoji,
+                    a.title,
+                    a.description,
+                ),
             );
+            // In-tank reward (hatch a fish), independent of the toast opt-in.
+            if (this.reward) {
+                await this.reward();
+            }
         }
         return newlyUnlocked;
     }

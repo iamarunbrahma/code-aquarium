@@ -28,6 +28,7 @@ export function aquariumPanelApp(
     _reactToCoding: boolean,
     dayNightCycle: boolean,
     disableEffects: boolean,
+    chatter: boolean,
     stateApi?: IStateApi,
 ): void {
     const api: IStateApi = stateApi ?? wrapVsCode(acquireVsCodeApi());
@@ -37,6 +38,7 @@ export function aquariumPanelApp(
         size: size as FishSize,
         dayNightCycle,
         disableEffects,
+        chatter,
     });
     let saveCounter = 0;
 
@@ -51,6 +53,10 @@ export function aquariumPanelApp(
                 saveCounter += 1;
                 if (saveCounter % 10 === 0) {
                     saveState(api, tank);
+                    api.postMessage({
+                        command: 'stats',
+                        fish: tank.statsSnapshot(),
+                    });
                 }
                 break;
             case 'add-fish':
@@ -75,6 +81,12 @@ export function aquariumPanelApp(
             case 'clean-tank':
                 tank.cleanTank();
                 break;
+            case 'celebrate':
+                tank.celebrate();
+                break;
+            case 'startle':
+                tank.startleAll();
+                break;
             case 'reset-all':
                 tank.reset();
                 break;
@@ -98,6 +110,9 @@ export function aquariumPanelApp(
                 break;
             case 'disable-effects':
                 tank.setEffectsEnabled(!(msg['disabled'] as boolean));
+                break;
+            case 'set-chatter':
+                tank.setChatter(msg['enabled'] as boolean);
                 break;
             case 'hatch-fish':
                 tank.hatchCelebration(

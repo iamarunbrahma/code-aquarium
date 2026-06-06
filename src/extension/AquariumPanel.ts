@@ -27,6 +27,7 @@ export class AquariumPanel extends AquariumWebviewContainer {
         disableEffects: boolean,
         reactToCoding: boolean,
         dayNightCycle: boolean,
+        chatter: boolean,
         messageHandler?: WebviewMessageHandler,
     ): AquariumPanel {
         const column = vscode.window.activeTextEditor
@@ -61,6 +62,7 @@ export class AquariumPanel extends AquariumWebviewContainer {
             disableEffects,
             reactToCoding,
             dayNightCycle,
+            chatter,
             messageHandler,
         );
         return AquariumPanel.currentPanel;
@@ -76,6 +78,7 @@ export class AquariumPanel extends AquariumWebviewContainer {
         disableEffects: boolean,
         reactToCoding: boolean,
         dayNightCycle: boolean,
+        chatter: boolean,
         messageHandler?: WebviewMessageHandler,
     ): void {
         AquariumPanel.currentPanel = new AquariumPanel(
@@ -88,6 +91,7 @@ export class AquariumPanel extends AquariumWebviewContainer {
             disableEffects,
             reactToCoding,
             dayNightCycle,
+            chatter,
             messageHandler,
         );
     }
@@ -102,6 +106,7 @@ export class AquariumPanel extends AquariumWebviewContainer {
         disableEffects: boolean,
         reactToCoding: boolean,
         dayNightCycle: boolean,
+        chatter: boolean,
         messageHandler?: WebviewMessageHandler,
     ) {
         super(
@@ -113,6 +118,7 @@ export class AquariumPanel extends AquariumWebviewContainer {
             disableEffects,
             reactToCoding,
             dayNightCycle,
+            chatter,
         );
         this._panel = panel;
         this._messageHandler = messageHandler;

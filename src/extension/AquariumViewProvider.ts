@@ -26,6 +26,7 @@ export class AquariumViewProvider
         disableEffects: boolean,
         reactToCoding: boolean,
         dayNightCycle: boolean,
+        chatter: boolean,
     ) {
         super(
             extensionUri,
@@ -36,6 +37,7 @@ export class AquariumViewProvider
             disableEffects,
             reactToCoding,
             dayNightCycle,
+            chatter,
         );
     }
 

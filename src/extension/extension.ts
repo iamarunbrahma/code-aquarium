@@ -19,6 +19,7 @@ import {
     getConfiguredTheme,
     getDayNightCycle,
     getDisableEffects,
+    getFishChatter,
     getMaxFish,
     getReactToCoding,
     getWebviewOptions,
@@ -34,11 +35,15 @@ import { AquariumViewProvider } from './AquariumViewProvider';
 import { IAquariumPanel } from './AquariumWebviewContainer';
 import { GitWatcher } from './gitWatcher';
 import { ActivityWatcher } from './activityWatcher';
+import { DevReactionWatcher } from './devReactionWatcher';
 import { ACHIEVEMENTS, Achievement, AchievementTracker } from './achievements';
+import { rewardAction } from './achievementReward';
+import { randomFishSpec } from './randomFish';
 
 let viewProvider: AquariumViewProvider;
 let gitWatcher: GitWatcher;
 let activityWatcher: ActivityWatcher;
+let devReactionWatcher: DevReactionWatcher;
 let achievements: AchievementTracker;
 let stats: ITankStats;
 let collection: FishSpecification[] = [];
@@ -77,8 +82,53 @@ async function ensurePanel(
         getDisableEffects(),
         getReactToCoding(),
         getDayNightCycle(),
+        getFishChatter(),
         buildMessageHandler(),
     );
+}
+
+// Latest live stats reported by the webview sim, keyed by fish name. Roll
+// Call reads these so it shows the running values instead of the frozen
+// snapshot stored in the collection.
+interface LiveStat {
+    hunger: number;
+    happiness: number;
+    energy: number;
+    mood: string;
+}
+const liveStats = new Map<string, LiveStat>();
+
+function updateLiveStats(fish: unknown[]): void {
+    for (const entry of fish) {
+        if (!entry || typeof entry !== 'object') {
+            continue;
+        }
+        const rec = entry as Record<string, unknown>;
+        if (typeof rec['name'] !== 'string') {
+            continue;
+        }
+        liveStats.set(rec['name'], {
+            hunger: Number(rec['hunger']) || 0,
+            happiness: Number(rec['happiness']) || 0,
+            energy: Number(rec['energy']) || 0,
+            mood: typeof rec['mood'] === 'string' ? rec['mood'] : '',
+        });
+    }
+}
+
+function moodEmoji(mood: string): string {
+    switch (mood) {
+        case 'happy':
+            return '💛';
+        case 'hungry':
+            return '🍤';
+        case 'tired':
+            return '💤';
+        case 'grumpy':
+            return '😾';
+        default:
+            return '🙂';
+    }
 }
 
 function buildMessageHandler(): WebviewMessageHandler {
@@ -99,6 +149,11 @@ function buildMessageHandler(): WebviewMessageHandler {
                     void vscode.window.showErrorMessage(msg['text'] as string);
                 }
                 return;
+            case 'stats':
+                if (Array.isArray(msg['fish'])) {
+                    updateLiveStats(msg['fish'] as unknown[]);
+                }
+                return;
             default:
                 return;
         }
@@ -113,6 +168,23 @@ async function spawnAllFish(): Promise<void> {
     for (const fish of collection) {
         panel.addFish(fish);
     }
+}
+
+// Reward for unlocking an achievement: hatch a celebratory fish when there
+// is room, otherwise just sparkle so the tank never exceeds maxFish. Fires
+// regardless of the notification opt-in.
+async function hatchAchievementReward(
+    context: vscode.ExtensionContext,
+): Promise<void> {
+    const panel = activePanel();
+    if (rewardAction(collection.length, getMaxFish()) === 'celebrate') {
+        panel?.celebrate();
+        return;
+    }
+    const spec = randomFishSpec(getConfiguredSize());
+    collection.push(spec);
+    await storeCollectionAsMemento(context, collection);
+    panel?.hatchFish(spec);
 }
 
 async function pickSpecies(): Promise<FishSpecies | undefined> {
@@ -238,16 +310,23 @@ async function rollCallFlow(): Promise<void> {
         );
         return;
     }
-    const items: vscode.QuickPickItem[] = collection.map((f) => ({
-        label: `\uD83D\uDC1F ${f.name}`,
-        description: `${f.color} ${f.species}`,
-        detail: vscode.l10n.t(
-            'Happiness {0} \u00B7 Hunger {1} \u00B7 Energy {2}',
-            f.happiness,
-            f.hunger,
-            f.energy,
-        ),
-    }));
+    const items: vscode.QuickPickItem[] = collection.map((f) => {
+        const live = liveStats.get(f.name);
+        const happiness = Math.round(live?.happiness ?? f.happiness);
+        const hunger = Math.round(live?.hunger ?? f.hunger);
+        const energy = Math.round(live?.energy ?? f.energy);
+        const mood = live?.mood ? `${moodEmoji(live.mood)} ` : '';
+        return {
+            label: `\uD83D\uDC1F ${f.name}`,
+            description: `${mood}${f.color} ${f.species}`,
+            detail: vscode.l10n.t(
+                'Happiness {0} \u00B7 Hunger {1} \u00B7 Energy {2}',
+                happiness,
+                hunger,
+                energy,
+            ),
+        };
+    });
     await vscode.window.showQuickPick(items, {
         placeHolder: vscode.l10n.t('{0} fish in the tank', collection.length),
     });
@@ -320,6 +399,9 @@ function registerConfigurationListener(context: vscode.ExtensionContext): void {
             if (e.affectsConfiguration('codeAquarium.disableEffects')) {
                 panel.setDisableEffects(getDisableEffects());
             }
+            if (e.affectsConfiguration('codeAquarium.fishChatter')) {
+                panel.setChatter(getFishChatter());
+            }
         }),
     );
 }
@@ -343,6 +425,7 @@ function registerSerializer(context: vscode.ExtensionContext): void {
                 getDisableEffects(),
                 getReactToCoding(),
                 getDayNightCycle(),
+                getFishChatter(),
                 buildMessageHandler(),
             );
             await spawnAllFish();
@@ -420,6 +503,7 @@ export async function activate(
         getConfiguredSize(),
     );
     achievements = new AchievementTracker(context);
+    achievements.setRewardHandler(() => hatchAchievementReward(context));
 
     // First-run welcome: seed a small starter tank so the user sees life
     // immediately instead of an empty aquarium.
@@ -437,6 +521,7 @@ export async function activate(
         getDisableEffects(),
         getReactToCoding(),
         getDayNightCycle(),
+        getFishChatter(),
     );
     viewProvider.setMessageHandler(buildMessageHandler());
     context.subscriptions.push(
@@ -464,6 +549,15 @@ export async function activate(
         defaultSize: getConfiguredSize,
     });
     activityWatcher.start();
+
+    devReactionWatcher = new DevReactionWatcher({
+        context,
+        panel: activePanel,
+        achievements,
+        stats,
+        getCollection: () => collection,
+    });
+    devReactionWatcher.start();
 
     createStatusBar(context);
     registerCommands(context);
