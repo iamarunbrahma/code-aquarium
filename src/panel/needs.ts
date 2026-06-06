@@ -1,4 +1,4 @@
-import { FishSpecies } from '../common/types';
+import { FishMood, FishSpecies } from '../common/types';
 import { FishTrait } from './personality';
 import { FishState } from './states';
 
@@ -115,4 +115,25 @@ export function decayNeeds(
     );
 
     return { hunger, energy, happiness };
+}
+
+/**
+ * Derives a fish's mood from its needs: the most pressing unmet need wins,
+ * then overall wellbeing decides between happy and content.
+ */
+export function moodFor(needs: Needs): FishMood {
+    const avg = (needs.hunger + needs.happiness + needs.energy) / 3;
+    if (needs.hunger < 25) {
+        return FishMood.hungry;
+    }
+    if (needs.energy < 20) {
+        return FishMood.tired;
+    }
+    if (needs.happiness < 30) {
+        return FishMood.grumpy;
+    }
+    if (avg >= 70) {
+        return FishMood.happy;
+    }
+    return FishMood.content;
 }

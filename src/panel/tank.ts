@@ -567,7 +567,7 @@ function buildFish(opts: BuildFishOpts): BaseFish {
  * clearly-visible 0.6 in the dead of night - a gentle tint, never a
  * blackout. Drives the `--day-night` CSS variable.
  */
-function dayNightBrightness(hour: number): number {
+export function dayNightBrightness(hour: number): number {
     return 0.8 + 0.2 * Math.sin(((hour - 6) / 24) * Math.PI * 2);
 }
 

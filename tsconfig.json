@@ -3,6 +3,7 @@
         "noImplicitAny": true,
         "strictNullChecks": true,
         "outDir": "./.build-out",
+        "rootDir": "./src",
         "lib": ["es2020", "dom"],
         "target": "esnext"
     },

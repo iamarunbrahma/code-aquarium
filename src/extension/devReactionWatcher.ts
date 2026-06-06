@@ -72,6 +72,11 @@ export class DevReactionWatcher {
         if (!this.isEnabled()) {
             return;
         }
+        // A cancelled or terminated task has no exit code; ignore it so it
+        // counts as neither a pass nor a failure.
+        if (typeof e.exitCode !== 'number') {
+            return;
+        }
         const name = e.execution.task.name;
         if (e.exitCode === 0) {
             this.opts.stats.totalTasksPassed += 1;

@@ -286,15 +286,18 @@
         "watch": "webpack && tsc -watch -p ./tsconfig.extension.json",
         "lint": "eslint src --ext ts && prettier --check src",
         "lint:fix": "eslint src --ext ts --fix && prettier --write src",
-        "check": "npm run compile && npm run lint"
+        "check": "npm run compile && npm run lint",
+        "test": "tsc -p ./tsconfig.test.json && mocha \"out-test/test/**/*.test.js\""
     },
     "devDependencies": {
+        "@types/mocha": "^10.0.10",
         "@types/node": "^20.0.0",
         "@types/vscode": "~1.75.0",
         "@typescript-eslint/eslint-plugin": "^5.29.0",
         "@typescript-eslint/parser": "^5.29.0",
         "eslint": "^8.18.0",
         "eslint-plugin-unused-imports": "^2.0.0",
+        "mocha": "^11.7.6",
         "prettier": "^2.8.8",
         "ts-loader": "^9.3.0",
         "typescript": "^4.7.4",

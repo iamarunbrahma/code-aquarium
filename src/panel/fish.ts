@@ -15,7 +15,7 @@ import {
     traitForName,
     traitSpeedMultiplier,
 } from './personality';
-import { decayNeeds, exertionForState } from './needs';
+import { decayNeeds, exertionForState, moodFor } from './needs';
 
 export interface FishElementState {
     name: string;
@@ -71,7 +71,7 @@ const SPECIES_SCALE: Record<FishSpecies, number> = {
 const FRY_SCALE = 0.6;
 const ADULT_AGE = 3000;
 
-function growthFactor(age: number): number {
+export function growthFactor(age: number): number {
     if (age >= ADULT_AGE) {
         return 1;
     }
@@ -218,20 +218,11 @@ export abstract class BaseFish {
     }
 
     public mood(): FishMood {
-        const avg = (this.hunger + this.happiness + this.energy) / 3;
-        if (this.hunger < 25) {
-            return FishMood.hungry;
-        }
-        if (this.energy < 20) {
-            return FishMood.tired;
-        }
-        if (this.happiness < 30) {
-            return FishMood.grumpy;
-        }
-        if (avg >= 70) {
-            return FishMood.happy;
-        }
-        return FishMood.content;
+        return moodFor({
+            hunger: this.hunger,
+            energy: this.energy,
+            happiness: this.happiness,
+        });
     }
 
     public dart(): void {

@@ -271,6 +271,7 @@ async function releaseFishFlow(
         return;
     }
     collection = collection.filter((f) => f !== picked.value);
+    liveStats.delete(picked.value.name);
     activePanel()?.removeFish(picked.value.name);
     await storeCollectionAsMemento(context, collection);
     void vscode.window.showInformationMessage(
@@ -280,6 +281,7 @@ async function releaseFishFlow(
 
 async function releaseAllFlow(context: vscode.ExtensionContext): Promise<void> {
     collection = [];
+    liveStats.clear();
     activePanel()?.resetFish();
     await storeCollectionAsMemento(context, collection);
     void vscode.window.showInformationMessage(

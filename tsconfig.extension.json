@@ -6,6 +6,7 @@
         "lib": ["ES2020"],
         "sourceMap": true,
         "rootDirs": ["./src/extension", "./src/common"],
+        "rootDir": "./src",
         "strict": true
     },
     "exclude": [
