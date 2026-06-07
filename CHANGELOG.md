@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased
+## 0.0.3
 
 - The tank now celebrates git pushes and branch publishes with a sparkle burst, alongside the existing save and commit reactions.
 - Added five git-milestone achievements: Committed (50 commits), Century Commits (100 commits), Liftoff (first push), Shipping It (25 pushes), and Branch Out (first published branch).
@@ -14,6 +14,9 @@
 - "Disable effects" now also quiets the ambient surprises, prefers-reduced-motion is honored in the live animation (not just CSS), and a new "Fish chatter" setting can mute the idle talk and mood emotes.
 - Removed the leftover test scripts and unused test dependencies.
 - Now count debug sessions and build/test results, and grew the achievement set from 14 to 27 with new coding milestones: save/commit/push tiers, branch counts, a commit-hatch milestone, debugging (Debugger / Bug Hunter / Exterminator), and build outcomes (It Compiles! / All Green / Embrace Failure).
+- Fish now keep to species-appropriate depths: crabs and octopuses stay near the floor, sharks patrol mid-water, and community fish roam the upper water. Crabs chase sunken food along the sand instead of darting upward, and ease back down to the sand rather than snapping.
+- Every new fish now gets a unique, real name (each species' name pool grew to 50), so two fish can no longer share a name and silently fail to appear in the tank.
+- Coordinated the error and failed-build storm so a finished task no longer clears an ongoing error storm early, and vice versa.
 
 ## 0.0.2
 
