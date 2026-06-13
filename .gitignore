@@ -17,10 +17,3 @@ coverage/
 .idea/
 media/main-bundle.js
 .DS_Store
-
-# Asset working sources — high-res masters kept locally, never shipped (see
-# .vscodeignore) and too heavy to commit. The shipped art lives in media/.
-assets_raw/
-assets-final/
-assets_old/
-assets-staging/
