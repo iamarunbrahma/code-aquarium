@@ -137,19 +137,8 @@ function buildMessageHandler(): WebviewMessageHandler {
         if (!msg || typeof msg !== 'object') {
             return;
         }
+        // The webview only ever reports live fish stats back to the host.
         switch (msg.command) {
-            case 'info':
-                if (typeof msg['text'] === 'string') {
-                    void vscode.window.showInformationMessage(
-                        msg['text'] as string,
-                    );
-                }
-                return;
-            case 'alert':
-                if (typeof msg['text'] === 'string') {
-                    void vscode.window.showErrorMessage(msg['text'] as string);
-                }
-                return;
             case 'stats':
                 if (Array.isArray(msg['fish'])) {
                     updateLiveStats(msg['fish'] as unknown[]);
