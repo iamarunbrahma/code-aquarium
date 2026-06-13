@@ -72,7 +72,7 @@ export class ActivityWatcher {
         this.disposables.push(
             git.onPublish((branch) => void this.onPublish(branch)),
         );
-        this.idleTimer = setInterval(() => this.checkIdle(), 30_000);
+        this.idleTimer = setInterval(() => this.checkIdle(), 60_000);
         // Register disposables so VS Code unwinds them on deactivation.
         context.subscriptions.push({ dispose: () => this.dispose() });
     }

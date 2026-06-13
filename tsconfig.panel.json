@@ -9,10 +9,5 @@
         "rootDir": "./src",
         "strict": true
     },
-    "exclude": [
-        "node_modules",
-        ".vscode-test",
-        "src/extension",
-        "src/test"
-    ]
+    "exclude": ["node_modules", ".vscode-test", "src/extension", "src/test"]
 }

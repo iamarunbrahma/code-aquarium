@@ -78,6 +78,17 @@ const SPECIES_SCALE: Record<FishSpecies, number> = {
 const FRY_SCALE = 0.6;
 const ADULT_AGE = 3000;
 
+// Fish scale gently with the tank width but stay within a comfortable band, so
+// they shrink a bit in a narrow sidebar and don't become dots in a wide panel.
+const FISH_REF_WIDTH = 1000;
+const FISH_MIN_SCALE = 0.7;
+const FISH_MAX_SCALE = 1.25;
+
+function viewportScale(): number {
+    const s = window.innerWidth / FISH_REF_WIDTH;
+    return Math.min(FISH_MAX_SCALE, Math.max(FISH_MIN_SCALE, s));
+}
+
 export function growthFactor(age: number): number {
     if (age >= ADULT_AGE) {
         return 1;
@@ -105,6 +116,14 @@ const FISH_QUIPS: ReadonlyArray<string> = [
     'Ship the code, then pet me.',
     'Five stars. Would swim again.',
     'Wow. Contact. How social.',
+    'Pet acknowledged. Carry on.',
+    'I felt that. We are bonded now.',
+    'Touch fish, fix bug. Science.',
+    "I'm basically a coworker.",
+    'Hydrated and motivated. You?',
+    'That tickled. Tell no one.',
+    'Refactor your heart, then pet me.',
+    'I am the senior fish here.',
 ];
 
 /**
@@ -138,8 +157,8 @@ export abstract class BaseFish {
     protected lastSpeech?: string;
 
     public abstract sequence: ISequenceTree;
-    public abstract emoji: string;
-    public abstract hello: string;
+    public abstract emojis: ReadonlyArray<string>;
+    public abstract hellos: ReadonlyArray<string>;
 
     constructor(opts: FishConstructorOpts) {
         this.name = opts.name;
@@ -174,15 +193,24 @@ export abstract class BaseFish {
     }
 
     /**
-     * Rendered sprite size: tank size scaled by this species' proportion and
-     * the fish's age-based growth (fry render smaller, adults full size).
+     * Rendered sprite size: tank size scaled by this species' proportion, the
+     * fish's age-based growth (fry render smaller, adults full size), and a
+     * clamped viewport factor so fish stay comfortably sized across tank sizes.
      */
     protected pixelSize(): number {
         return Math.round(
             SIZE_PX[this.size] *
                 SPECIES_SCALE[this.species] *
-                growthFactor(this.age),
+                growthFactor(this.age) *
+                viewportScale(),
         );
+    }
+
+    /** Re-apply the rendered size; called on window resize for the clamp. */
+    public refreshSize(): void {
+        const px = this.pixelSize();
+        this.el.style.width = `${px}px`;
+        this.el.style.height = `${px}px`;
     }
 
     /** Resize the sprite to match current growth as the fish ages. */
@@ -255,7 +283,7 @@ export abstract class BaseFish {
      * avoid repeating the previous line back-to-back.
      */
     public speak(): string {
-        const pool = [this.hello, ...FISH_QUIPS];
+        const pool = [...this.hellos, ...FISH_QUIPS];
         let line = pool[Math.floor(Math.random() * pool.length)];
         if (line === this.lastSpeech) {
             line = pool[Math.floor(Math.random() * pool.length)];
@@ -267,6 +295,23 @@ export abstract class BaseFish {
     /** An unprompted idle musing, flavoured by personality and time of day. */
     public ambientSpeak(isNight: boolean): string {
         return ambientLine(this.trait, isNight);
+    }
+
+    /**
+     * Glyphs that float up when this fish is petted: two of the species' own
+     * emojis with a heart between them, so a pet feels affectionate and
+     * species-flavoured rather than a generic heart burst.
+     */
+    public tapEmojis(): string[] {
+        const pool = [...this.emojis];
+        const first = pool.splice(
+            Math.floor(Math.random() * pool.length),
+            1,
+        )[0];
+        const second = pool.length
+            ? pool.splice(Math.floor(Math.random() * pool.length), 1)[0]
+            : first;
+        return [first, '♥', second];
     }
 
     /** Slow the fish right down when the OS asks for reduced motion. */

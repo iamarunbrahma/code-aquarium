@@ -73,9 +73,14 @@ export class Tank {
     public start(): void {
         this.applyTheme();
         this.applyDayNight();
-        renderAmbientLayer(this.refs.background);
         this.installInteractions();
         this.installIdleSurprises();
+        // Re-apply the clamped fish sizes when the tank is resized.
+        window.addEventListener('resize', () => {
+            for (const f of this.fish) {
+                f.refreshSize();
+            }
+        });
     }
 
     /**
@@ -200,7 +205,7 @@ export class Tank {
         el.classList.add('fish-pet');
         this.showSpeech(fish, fish.speak());
         this.spawnPetRing(fish);
-        this.burstHearts(fish);
+        this.burstTapEmojis(fish);
         // A few extra bubbles from the fish location for an "excited" pop.
         this.bubbles.burst();
     }
@@ -229,9 +234,9 @@ export class Tank {
         setTimeout(() => ring.parentElement?.removeChild(ring), 820);
     }
 
-    private burstHearts(fish: BaseFish): void {
+    private burstTapEmojis(fish: BaseFish): void {
         const pos = fish.position();
-        const glyphs = ['\u2665', '\u2728', '\u2665'];
+        const glyphs = fish.tapEmojis();
         for (let i = 0; i < glyphs.length; i++) {
             const h = document.createElement('div');
             h.className = 'heart';
@@ -486,8 +491,17 @@ export class Tank {
     private applyTheme(): void {
         const bgUrl = this.themeInfo.backgroundUrl(this.opts.baseAssetUri);
         this.refs.background.style.backgroundImage = `url(${bgUrl})`;
-        this.refs.background.style.backgroundSize = 'cover';
-        this.refs.background.style.backgroundPosition = 'center';
+        // Fit-to-width: the backdrop spans the full tank width and anchors to the
+        // bottom, so the floor is always visible and the sides are never cropped.
+        // In tall/narrow tanks the open water above is filled by waterColor (which
+        // matches the backdrop's top row, so the seam is invisible).
+        this.refs.background.style.backgroundSize = '100% auto';
+        this.refs.background.style.backgroundPosition = 'center bottom';
+        this.refs.background.style.backgroundRepeat = 'no-repeat';
+        this.refs.background.style.backgroundColor = this.themeInfo.waterColor;
+        // Re-seed the ambient layer so theme-specific elements (e.g. the deep-ocean
+        // whale silhouette) appear/disappear when the theme changes.
+        renderAmbientLayer(this.refs.background, this.themeInfo.name);
         this.bubbles.setDensity(this.themeInfo.bubbleDensity);
         renderDecorations(
             this.refs.decor,

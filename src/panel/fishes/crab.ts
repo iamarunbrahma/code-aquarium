@@ -3,8 +3,27 @@ import { ISequenceTree } from '../sequences';
 import { FishState } from '../states';
 
 export class Crab extends BaseFish {
-    public emoji = '\uD83E\uDD80';
-    public hello = '*claws clack*';
+    public emojis = [
+        '\uD83E\uDD80',
+        '\uD83D\uDE20',
+        '\uD83E\uDEE7',
+        '\u2728',
+        '\uD83D\uDCA2',
+    ];
+    public hellos = [
+        '*claws clack* \uD83E\uDD80',
+        'Pinch first, talk later.',
+        'I only walk sideways. Deal.',
+        'Grumpy? I prefer "crabby." \uD83D\uDE20',
+        'Snip snip. That is a warning.',
+        'Hard shell, harder attitude.',
+        'Get off my sand. \uD83E\uDD80',
+        'I scuttle, therefore I am.',
+        'These claws are not for hugs.',
+        'Bottom-dweller and proud.',
+        'You woke me. Bold. \uD83D\uDE24',
+        'Pet at your own risk. \uD83E\uDD80',
+    ];
 
     public sequence: ISequenceTree = {
         startingState: FishState.walkRight,

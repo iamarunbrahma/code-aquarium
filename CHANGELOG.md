@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.0.5
+
+- Redrew the three tank backdrops (coral reef, sunken ship, deep ocean) as full painted underwater scenes - real ocean water up top fading to a sand/seabed floor - and removed the stray corner sparkle from each.
+- Deep ocean is lighter and bluer, with an oceanic grey-blue seabed and resting bottom-dwellers; tuned each theme's water fill colour to match its new backdrop.
+- Refreshed the floor decorations across all themes so every prop sprite is used: a fuller coral reef, treasure-and-shells around the wreck, and a sparse pair of urchins in the deep.
+- Petting a fish now draws from a much larger pool of species-specific one-liners (about a dozen each) and pops that species' own emojis instead of a generic heart burst.
+
 ## 0.0.3
 
 - The tank now celebrates git pushes and branch publishes with a sparkle burst, alongside the existing save and commit reactions.

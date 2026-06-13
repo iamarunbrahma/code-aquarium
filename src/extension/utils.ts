@@ -38,7 +38,17 @@ export function getConfiguredSize(): FishSize {
 }
 
 export function getConfiguredTheme(): TankTheme {
-    return readEnum<TankTheme>('theme', DEFAULT_THEME, ALL_THEMES);
+    // Migrate the legacy 'deep-sea' value (renamed to 'deep-ocean') so existing
+    // users keep their theme instead of falling back to the default.
+    const raw = vscode.workspace
+        .getConfiguration(CONFIG_NAMESPACE)
+        .get<string>('theme', DEFAULT_THEME);
+    if (raw === 'deep-sea') {
+        return TankTheme.deepOcean;
+    }
+    return ALL_THEMES.includes(raw as TankTheme)
+        ? (raw as TankTheme)
+        : DEFAULT_THEME;
 }
 
 export function getConfiguredPosition(): ExtPosition {

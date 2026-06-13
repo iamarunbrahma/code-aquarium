@@ -11,3 +11,11 @@ src/**
 .build-out/
 coverage/
 node_modules
+
+# Asset working directories — sources for media/, never shipped in the package.
+assets_raw/**
+assets-final/**
+assets-staging/**
+assets_old/**
+assets_prompts.txt
+harness.html

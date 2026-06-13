@@ -1,0 +1,272 @@
+==============================================================================
+AQUARIUM ASSET GENERATION PROMPTS  (Nano Banana Pro)
+==============================================================================
+
+EDITING CONTRACT (why the prompts are shaped this way)
+------------------------------------------------------
+Two pipelines:
+
+BACKGROUNDS (coral_reef, sunken_ship, deep_ocean) -> full-color OPAQUE scenes.
+- Real ocean water at the top, real seabed floor at the bottom -> NO magenta, NO
+  chroma key, NO transparency; the scene fills the frame edge-to-edge.
+- A smooth vertical water gradient + a graded floor ARE allowed here (the only
+  place gradients are permitted) -> matches the reference look, exports to WebP.
+- No sparkles / glints / god-rays / floating particles on the open water -> stays
+  clean and graphic.
+
+PROP SPRITES (the PROP SPRITES section) -> still on solid #FF00FF magenta for
+one-pass chroma key to transparency, so they overlay on the backgrounds at runtime.
+- No magenta / neon-pink inside the prop art -> the key never bites the artwork.
+- Flat solid colors, crisp edges, no gradients/noise -> compresses to a tiny
+  transparent WebP, with the form preserved.
+
+Each background's final prompt = its own [STYLE] + [DEPTH & PHYSICS] + [BACKGROUND]
++ [CONSTRAINTS] + [SUBJECT] (self-contained per theme). Each prop's final prompt =
+the shared PROP SPRITES blocks + ONE [SUBJECT] line.
+
+
+==============================================================================
+THEME BACKGROUNDS  (full-color opaque scenes - 16:9, >= 2048x1152)
+==============================================================================
+Each theme below is self-contained: feed its [STYLE] + [DEPTH & PHYSICS] +
+[BACKGROUND] + [CONSTRAINTS] + [SUBJECT] together as one prompt.
+
+------------------------------------------------------------------------------
+THEME: coral_reef
+------------------------------------------------------------------------------
+[STYLE]
+Flat 2D vector illustration in a clean, friendly cartoon aquarium-game style. Bold
+SOLID flat color fills with crisp, smooth vector edges and clear, consistent dark
+line-art outlines (dark brown or navy, NOT pure black). Limited palette; at most
+simple 2-3 step cel-shading on the scenery - NO airbrushing, texture, grain, noise,
+or dithering on the scenery. Strict orthographic SIDE view at eye level (2D
+side-scroller look) - NOT top-down, NOT 3D, no camera tilt. Clean shapes with a
+storybook-game feel.
+
+[DEPTH & PHYSICS]
+Convey depth with 2-3 overlapping layers receding backward: nearer structures
+larger, more saturated and more detailed; farther structures rendered as DISTINCT
+flat, cooler, desaturated silhouettes standing in the water with visible contrast
+(underwater atmospheric perspective) - distinct flat tonal layers, NOT a blurry
+haze. The ONLY gradients allowed are the water column and the seabed floor; the
+scenery itself stays flat cel-shaded. Light from above. Keep contact with the sand
+natural; do not paint a separate hard cast shadow onto the open water.
+
+[BACKGROUND]
+A full, opaque underwater scene - NO magenta, NO transparency, NO checkerboard. The
+water fills the upper ~75% of the frame as a smooth vertical gradient: icy pale cyan
+(#D7F0FC) at the very top, easing through soft sky-cyan to a medium ocean cyan-blue
+(#78C3E0) lower down. A thin, slightly brighter teal waterline strip marks where the
+water meets the seabed. The lower ~25% is a warm pale sandy floor (#E8DDBF), gently
+graded, spanning the full width. Scenery rises from this sand; open water and sand
+fill all the gaps.
+
+[CONSTRAINTS]
+Absolutely NO sparkles, stars, glints, twinkles, light specks, particles, bubbles,
+bokeh, god-rays, light shafts, or lens flare anywhere. NO fish, animals, divers, or
+creatures. NO text, numbers, watermark, logo, UI, frame, or border. NO photographic
+realism, grain, or noise. Gradients are allowed ONLY in the water column and the
+sandy floor - keep all scenery flat cel-shaded.
+
+[SUBJECT] - coral_reef   (16:9)
+A vibrant coral reef as three distinct clustered outcrops rising from the sandy
+floor with open cyan water between them. Each combines branching staghorn corals,
+rounded brain corals, fan corals, and tube sponges in flat reds, coral-pink, orange,
+violet and teal-green, with a few green anemones and short seagrass tufts on small
+rocky mounds. Healthy, lively, tropical, unmistakably a coral reef. Nearer corals
+larger and brighter; the far depth layer is a set of distinct cooler lavender/purple
+coral silhouettes standing in the water behind them.
+
+------------------------------------------------------------------------------
+THEME: sunken_ship
+------------------------------------------------------------------------------
+[STYLE]
+Flat 2D vector illustration in a clean, friendly cartoon aquarium-game style. Bold
+SOLID flat color fills with crisp, smooth vector edges and clear, consistent dark
+line-art outlines (dark brown or navy, NOT pure black). Limited palette; at most
+simple 2-3 step cel-shading on the scenery - NO airbrushing, texture, grain, noise,
+or dithering on the scenery. Strict orthographic SIDE view at eye level (2D
+side-scroller look) - NOT top-down, NOT 3D, no camera tilt. Clean shapes with a
+storybook-game feel.
+
+[DEPTH & PHYSICS]
+Convey depth with 2-3 overlapping layers receding backward: nearer structures
+larger, more saturated and more detailed; farther structures rendered as DISTINCT
+flat, cooler, desaturated silhouettes standing in the water with visible contrast
+(underwater atmospheric perspective) - distinct flat tonal layers, NOT a blurry
+haze. The ONLY gradients allowed are the water column and the seabed floor; the
+scenery itself stays flat cel-shaded. Light from above. Keep contact with the sand
+natural; do not paint a separate hard cast shadow onto the open water.
+
+[BACKGROUND]
+A full, opaque underwater scene - NO magenta, NO transparency, NO checkerboard. The
+water fills the upper ~75% of the frame as a smooth vertical gradient: muted
+steel-slate blue (#7AA4B8) at the top easing down to a deeper steel blue-teal
+(#5E8498) lower down. The water blends SOFTLY into the seabed with no hard line. The
+lower ~25% is a cooler muted tan sand floor (#C0B391), gently graded, spanning the
+full width. Scenery rises from this sand; open water and sand fill all the gaps.
+
+[CONSTRAINTS]
+Absolutely NO sparkles, stars, glints, twinkles, light specks, particles, bubbles,
+bokeh, god-rays, light shafts, or lens flare anywhere. NO fish, animals, divers, or
+creatures. NO text, numbers, watermark, logo, UI, frame, or border. NO photographic
+realism, grain, or noise. Gradients are allowed ONLY in the water column and the
+sandy floor - keep all scenery flat cel-shaded.
+
+[SUBJECT] - sunken_ship   (16:9)
+A single large weathered wooden shipwreck centerpiece, hull tilted on a small dark
+teal-green rocky mound on the sand, broken amidships with a jagged hull breach and a
+snapped leaning mast with torn rigging, a few scattered planks and an old barrel at
+its base, patches of seaweed and small corals on the rotting brown timber. Muted
+desaturated browns and teals, mysterious but clean and graphic. Behind it, one or
+two distinct cooler blue-teal ghost-wreck silhouettes stand in the water as a flat
+depth layer.
+
+------------------------------------------------------------------------------
+THEME: deep_ocean
+------------------------------------------------------------------------------
+[STYLE]
+Flat 2D vector illustration in a clean, friendly cartoon aquarium-game style. Bold
+SOLID flat color fills with crisp, smooth vector edges and clear, consistent dark
+line-art outlines (dark brown or navy, NOT pure black). Limited palette; at most
+simple 2-3 step cel-shading on the scenery - NO airbrushing, texture, grain, noise,
+or dithering on the scenery. Strict orthographic SIDE view at eye level (2D
+side-scroller look) - NOT top-down, NOT 3D, no camera tilt. Clean shapes with a
+storybook-game feel.
+
+[DEPTH & PHYSICS]
+Convey depth with 2-3 overlapping layers receding backward: nearer structures
+larger and more detailed; farther structures rendered as DISTINCT flat, cooler
+silhouettes standing in the deep blue water with visible contrast (underwater
+atmospheric perspective) - distinct flat tonal layers, NOT a blurry haze. The ONLY
+gradients allowed are the water column and the seabed floor; the scenery itself stays
+flat cel-shaded. Soft ambient light from above; deep but NOT pitch-black - the water
+and floor stay clearly readable. Keep contact with the seabed natural; do not paint a
+separate hard cast shadow onto the open water.
+
+[BACKGROUND]
+A full, opaque underwater scene - NO magenta, NO transparency, NO checkerboard. The
+water fills the upper ~75% of the frame as a smooth vertical gradient: a soft
+cornflower/periwinkle blue (#738CC0) at the top easing down to a deep indigo-navy
+(#2F4379) lower down - a clear, friendly ocean blue, NEVER near-black. The water
+blends SOFTLY into the seabed with no hard line. The lower ~25% is an oceanic cool grey-blue
+slate seabed grading from #46555C down to #313D44, spanning the full width. Deep and
+lonely but readable, with soft ambient light.
+
+[CONSTRAINTS]
+NO bubbles, bokeh, god-rays, light shafts, lens flare, drifting particle haze, or
+scattered star/sparkle fields. A FEW small bioluminescent cyan/teal glow dots and
+tips on the organisms ARE allowed (a sparse accent, never the whole organism lit).
+Allowed: 1-2 STATIC bottom-dwelling creatures resting on the seabed (a sea star and a
+sea cucumber). NO swimming fish, NO divers, NO mid-water animals - any seabed creature
+sits still on the floor. NO text, numbers, watermark, logo, UI, frame, or border. NO
+photographic realism, grain, or noise. Gradients are allowed ONLY in the water column
+and the seabed floor - keep all scenery flat cel-shaded.
+
+[SUBJECT] - deep_ocean   (16:9)
+A vast, near-barren deep-ocean plain - NO rocks, cliffs or boulders, nothing glassy
+or crystalline. A FEW widely-spaced, isolated dark sessile organisms rise from the
+flat grey-blue seabed (a barren abyss, NOT a dense reef): a tall feathery sea-pen, a
+low deep-sea coral, a slender sea-whip and one anemone, set far apart with bare
+grey-blue silt between them, in deep maroon, dark teal and midnight blue. Resting ON
+the seabed, two STATIC bottom-dwelling creatures: a five-armed sea star lying flat on
+the silt and a low knobbly sea cucumber - both still and half-settled into the floor,
+NOT swimming. The far depth layer is a couple of distinct cooler navy/teal organism
+silhouettes set back in the water. Bioluminescence is only a small ACCENT - a few
+glowing cyan and teal dots and tips, never the whole organism lit. Deep, calm and
+lonely, gently lit.
+
+
+==============================================================================
+PROP SPRITES
+==============================================================================
+
+[STYLE]
+Flat 2D vector game-sprite art, clean friendly cartoon aquarium style. Bold SOLID
+flat color fills, crisp smooth vector edges, limited palette, at most simple 2-3
+step cel-shading - NO gradients, airbrushing, texture, noise, or dithering. No
+hard black outlines (thin soft darker-tone outline at most). Orthographic
+side/front view at eye level. Clean shapes that scale down crisply and trace to
+vector cleanly.
+
+[DEPTH & PHYSICS]
+Show the object's volume with flat cel-shaded tone steps and clear light-from-
+above. A single, solid, well-rounded form. Do NOT add any cast or contact shadow
+on the background - the object sits on pure magenta (the app adds its own shadow
+at runtime).
+
+[BACKGROUND]
+Render on a SINGLE SOLID FLAT MAGENTA background, hex #FF00FF, filling the whole
+frame uniformly. One object, centered, filling ~80% of the frame, with a clean
+even margin of pure magenta all around. No checkerboard, no transparency, no
+gradient, no second object, no ground line - just the object on flat magenta.
+
+[CONSTRAINTS]
+NO sparkles, stars, glints, twinkles, specks, particles, bubbles, bokeh, or lens
+flare. NO magenta/neon-pink/hot-pink in the artwork (use coral-pink/rose/salmon/
+violet). NO cast or drop shadow on the magenta. NO text, watermark, frame,
+border, or extra objects. NO photographic realism, gradients, noise, grain, or
+texture.
+
+------------------------------------------------------------------------------
+[SUBJECT] - per prop   (square 1024x1024 unless marked TALL = 1024x1536)
+------------------------------------------------------------------------------
+
+REEF
+  coral_red      : A branching staghorn coral, flat warm red with soft orange tips.
+  coral_pink     : A rounded branching coral, flat rose-pink fading to pale tips.
+  coral_purple   : A flat purple fan/branching coral with violet tips.
+  sea_fan        : A tall lattice sea fan (gorgonian), flat orange or deep red,
+                   delicate branching mesh.
+  brain_coral    : A rounded brain-coral mound with maze-like grooves, flat pale
+                   pinkish-tan.
+  anemone        : A sea anemone with soft waving tentacles, rose-pink body and
+                   pale-green tips.
+  giant_clam     : A ridged clam shell slightly agape revealing a wavy flat
+                   electric-blue mantle.
+  sea_urchin     : A round dark purple-black sea urchin with long radiating spines.
+  starfish       : A chubby five-armed starfish, flat coral-orange with small
+                   cream dots.
+  pearl          : An open ridged clam shell in flat cream/tan with one glossy
+                   white pearl inside.
+  seaweed_green  : (TALL) A cluster of green sea-kelp blades, gently curved as if
+                   drifting.
+
+SUNKEN SHIP
+  treasure_chest : A weathered wooden chest, dark metal banding, lid ajar, a few
+                   flat gold coins inside, brown timber matching the wreck.
+  anchor         : An old rusty iron anchor leaning upright with a loop of chain.
+  ship_wheel     : A weathered wooden helm wheel with spokes, barnacle-spotted.
+  cannon         : A short dark-iron naval cannon, slightly tilted, a little
+                   seaweed draped over it.
+  barrel         : A single weathered wooden barrel with rusted metal hoops.
+  amphora        : An old terracotta amphora jar, one slightly cracked.
+
+DEEP OCEAN
+  glow_coral     : A cluster of bioluminescent deep-sea coral glowing flat cyan
+                   and violet on a dark rock base.
+  glow_crystals  : A cluster of glowing teal crystal shards on a dark rock.
+  vent_chimney   : (TALL) A hydrothermal black-smoker chimney: a dark craggy spire
+                   with a faint warm-orange glow at its tip.
+  rock_spire     : (TALL) A tall jagged dark-blue rock spire/stalagmite, flat
+                   faceted shading.
+
+UNIVERSAL
+  boulder        : A smooth grey boulder cluster with a little moss.
+  kelp_tall      : (TALL) A tall strand of giant kelp with broad leafy blades.
+
+
+==============================================================================
+OUTPUT SETTINGS
+==============================================================================
+- Backgrounds: full-color OPAQUE scene, NO magenta / NO chroma key. 16:9,
+               >= 2048x1152. One theme per image; export to WebP.
+- Prop sprites: one subject per image on a solid #FF00FF magenta background
+                (chroma-keyed to transparency). 1024x1024, TALL ones 1024x1536.
+- Filenames:   backgrounds use background.webp under the theme folder; props use
+               the name shown (coral_red.webp, sunken_ship.webp, ...).
+- Consistency: generate each background from its own self-contained blocks, and
+               reuse the shared PROP SPRITES blocks for every prop. Once you have
+               one you like, attach it as a style reference to keep the rest
+               consistent.
+==============================================================================

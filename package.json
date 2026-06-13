@@ -2,7 +2,7 @@
     "name": "code-aquarium-app",
     "displayName": "Code Aquarium",
     "description": "A cozy pixel aquarium for VS Code where fish react to your saves, commits, and idle time.",
-    "version": "0.0.4",
+    "version": "0.0.5",
     "engines": {
         "vscode": "^1.75.0"
     },
@@ -193,14 +193,14 @@
                         "type": "string",
                         "enum": [
                             "coral-reef",
-                            "deep-sea",
+                            "deep-ocean",
                             "sunken-ship"
                         ],
                         "default": "coral-reef",
                         "description": "%codeAquarium.theme.description%",
                         "enumItemLabels": [
                             "%codeAquarium.theme.coral-reef%",
-                            "%codeAquarium.theme.deep-sea%",
+                            "%codeAquarium.theme.deep-ocean%",
                             "%codeAquarium.theme.sunken-ship%"
                         ]
                     },

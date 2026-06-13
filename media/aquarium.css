@@ -38,7 +38,7 @@ body {
     position: relative;
     filter: brightness(calc(var(--light-level) * var(--day-night)));
     transition: filter 800ms ease;
-    cursor: crosshair;
+    cursor: pointer;
 }
 
 #tankCanvasContainer,

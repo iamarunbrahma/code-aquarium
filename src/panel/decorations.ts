@@ -1,4 +1,9 @@
+import { TankTheme } from '../common/types';
 import { DecorationSpec, TankThemeInfo } from './themes';
+
+// Reference tank width (px) that DecorationSpec.widthPx values are tuned for.
+// Widths are converted to vw against this so decorations scale with tank width.
+const REF_WIDTH = 1000;
 
 /**
  * Renders the theme's decorations as absolutely-positioned <img> tags
@@ -25,7 +30,9 @@ function makeDecoration(
     img.style.position = 'absolute';
     img.style.left = `${spec.leftPct}%`;
     img.style.bottom = `${spec.bottomPct}%`;
-    img.style.width = `${spec.widthPx}px`;
+    // Responsive width: widthPx is tuned for a ~REF_WIDTH-wide tank and expressed
+    // in vw so props scale with the tank exactly like the fit-to-width backdrop.
+    img.style.width = `${((spec.widthPx / REF_WIDTH) * 100).toFixed(3)}vw`;
     img.style.height = 'auto';
     img.style.pointerEvents = 'none';
     // Stagger sway phase so adjacent decorations don't move in lockstep.
@@ -35,21 +42,17 @@ function makeDecoration(
 }
 
 function decorationClass(asset: string): string {
-    if (asset.startsWith('seaweed')) {
+    const name = asset.replace(/\.(webp|svg|png)$/, '');
+    // Tall, flexible plants get the pronounced tall sway.
+    if (name === 'seaweed_green' || name === 'kelp_tall') {
         return 'deco-seaweed';
     }
-    if (asset.startsWith('coral')) {
+    // Soft, branching organisms get the gentle coral sway.
+    if (name.startsWith('coral_') || name === 'sea_fan' || name === 'anemone') {
         return 'deco-coral';
     }
-    if (
-        asset.startsWith('treasure') ||
-        asset.startsWith('sunken') ||
-        asset.startsWith('pearl') ||
-        asset.startsWith('starfish')
-    ) {
-        return 'deco-static';
-    }
-    return '';
+    // Everything rigid (chest, anchor, shells, rocks, urchin, crystals) just bobs.
+    return 'deco-static';
 }
 
 /**
@@ -66,7 +69,10 @@ function decorationClass(asset: string): string {
  * Pure CSS animation under the hood — we only seed elements and
  * randomize timing/position once on theme apply.
  */
-export function renderAmbientLayer(background: HTMLElement): void {
+export function renderAmbientLayer(
+    background: HTMLElement,
+    theme: TankTheme,
+): void {
     background.innerHTML = '';
 
     // 1. Water surface band — wavy sun-beam top.
@@ -82,23 +88,26 @@ export function renderAmbientLayer(background: HTMLElement): void {
     caustB.className = 'floor-caustics-b';
     background.appendChild(caustB);
 
-    // 3. Sand floor anchoring the bottom.
-    const floor = document.createElement('div');
-    floor.className = 'sand-floor';
-    background.appendChild(floor);
+    // The sand floor is now painted into each theme's background image, so we
+    // no longer render a CSS .sand-floor here (it would double up).
 
-    // 4. Giant deep silhouette — a slow whale drifting in the deep layer.
-    const whale = document.createElement('div');
-    whale.className = 'deep-silhouette whale';
-    whale.style.top = `${28 + Math.random() * 18}%`;
-    const whaleDur = 60 + Math.random() * 40;
-    whale.style.animationDuration = `${whaleDur.toFixed(1)}s`;
-    whale.style.animationDelay = `${(-Math.random() * whaleDur).toFixed(1)}s`;
-    if (Math.random() < 0.5) {
-        whale.style.transform = 'scaleX(-1)';
-        whale.style.animationDirection = 'reverse';
+    // 4. Giant deep silhouette — a slow whale drifting through the gloom. Only
+    // in deep ocean, where a looming background shape fits the mood.
+    if (theme === TankTheme.deepOcean) {
+        const whale = document.createElement('div');
+        whale.className = 'deep-silhouette whale';
+        whale.style.top = `${28 + Math.random() * 18}%`;
+        const whaleDur = 60 + Math.random() * 40;
+        whale.style.animationDuration = `${whaleDur.toFixed(1)}s`;
+        whale.style.animationDelay = `${(-Math.random() * whaleDur).toFixed(
+            1,
+        )}s`;
+        if (Math.random() < 0.5) {
+            whale.style.transform = 'scaleX(-1)';
+            whale.style.animationDirection = 'reverse';
+        }
+        background.appendChild(whale);
     }
-    background.appendChild(whale);
 
     // 5. Distant micro-fish — solo drifters at varying speeds and depths.
     const fishCount = 8;

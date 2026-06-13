@@ -3,8 +3,27 @@ import { ISequenceTree } from '../sequences';
 import { FishState } from '../states';
 
 export class Octopus extends BaseFish {
-    public emoji = '\uD83D\uDC19';
-    public hello = '*eight-armed wave*';
+    public emojis = [
+        '\uD83D\uDC19',
+        '\uD83D\uDC9C',
+        '\uD83C\uDF00',
+        '\u2728',
+        '\uD83E\uDEE7',
+    ];
+    public hellos = [
+        '*eight-armed wave* \uD83D\uDC19',
+        'Eight arms, zero patience.',
+        'Three hearts, all judging you.',
+        'Smartest one in the tank. \uD83E\uDDE0',
+        'Ink first, ask later. \uD83C\uDF00',
+        'I can open jars. Can you?',
+        'Mysterious and squishy. \uD83D\uDC9C',
+        'High-five? I have eight. \uD83D\uDC19',
+        'Camouflage: activated.',
+        'I solved your bug in my sleep.',
+        'Glub from the deep. \uD83E\uDEE7',
+        'Tentacles crossed for you. \uD83D\uDC9C',
+    ];
 
     public sequence: ISequenceTree = {
         startingState: FishState.idle,

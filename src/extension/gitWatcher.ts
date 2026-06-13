@@ -10,6 +10,7 @@ interface GitBranch {
 
 interface GitRepository {
     state: {
+        // eslint-disable-next-line @typescript-eslint/naming-convention -- mirrors the vscode.git API (Repository.state.HEAD)
         HEAD?: GitBranch;
         onDidChange: (cb: () => void) => vscode.Disposable;
     };

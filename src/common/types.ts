@@ -30,7 +30,7 @@ export const enum FishSize {
 
 export const enum TankTheme {
     coralReef = 'coral-reef',
-    deepSea = 'deep-sea',
+    deepOcean = 'deep-ocean',
     sunkenShip = 'sunken-ship',
 }
 
@@ -77,7 +77,7 @@ export const ALL_SIZES: ReadonlyArray<FishSize> = [
 
 export const ALL_THEMES: ReadonlyArray<TankTheme> = [
     TankTheme.coralReef,
-    TankTheme.deepSea,
+    TankTheme.deepOcean,
     TankTheme.sunkenShip,
 ];
 

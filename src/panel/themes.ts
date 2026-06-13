@@ -12,72 +12,89 @@ export interface TankThemeInfo {
     backgroundUrl(baseAssetUri: string): string;
     decorations: DecorationSpec[];
     bubbleDensity: number;
+    // Solid fill behind the backdrop image. The backdrop is sized to the tank
+    // width and anchored to the bottom, so in tall/narrow tanks open water sits
+    // above it — this color (matching the backdrop's top row) fills that space
+    // seamlessly. Keeps the scene fit-to-width responsive without side-cropping.
+    waterColor: string;
 }
 
+// Each background is a painted backdrop (water + sand/floor + scenery). The
+// decorations below are foreground props strung along the sand line in front
+// of that backdrop, all rooted near the same bottomPct so they sit on the floor.
 const CORAL_REEF: TankThemeInfo = {
     name: TankTheme.coralReef,
-    backgroundUrl: (uri) =>
-        `${uri}/backgrounds/coral-reef/background-light.svg`,
-    // Corals clustered into three reef outcrops rather than an even row:
-    // overlapping leftPct and varied widths give reef density. Every
-    // decoration shares one bottomPct so all bases root on the same sand
-    // line instead of floating at different heights.
+    backgroundUrl: (uri) => `${uri}/backgrounds/coral-reef/background.webp`,
+    // Foreground props strung along the sand in front of the painted reef:
+    // the full coral set (red, purple, pink, sea_fan) plus accents (seaweed,
+    // clam, pearl, anemone, urchin) and two starfish at different spots/heights.
     decorations: [
-        // Left outcrop
-        { asset: 'seaweed_green.svg', leftPct: 7, bottomPct: 6, widthPx: 38 },
-        { asset: 'coral_purple.svg', leftPct: 3, bottomPct: 6, widthPx: 74 },
-        { asset: 'coral_red.svg', leftPct: 11, bottomPct: 6, widthPx: 96 },
-        { asset: 'coral_pink.svg', leftPct: 20, bottomPct: 6, widthPx: 60 },
-        // Open sand
-        { asset: 'starfish.svg', leftPct: 33, bottomPct: 6, widthPx: 30 },
-        // Centre outcrop
-        { asset: 'seaweed_green.svg', leftPct: 56, bottomPct: 6, widthPx: 40 },
-        { asset: 'coral_red.svg', leftPct: 42, bottomPct: 6, widthPx: 84 },
-        { asset: 'coral_pink.svg', leftPct: 48, bottomPct: 6, widthPx: 94 },
-        { asset: 'coral_purple.svg', leftPct: 54, bottomPct: 6, widthPx: 56 },
-        // Open sand
-        { asset: 'pearl.svg', leftPct: 70, bottomPct: 6, widthPx: 20 },
-        // Right outcrop
-        { asset: 'seaweed_green.svg', leftPct: 88, bottomPct: 6, widthPx: 36 },
-        { asset: 'coral_purple.svg', leftPct: 78, bottomPct: 6, widthPx: 80 },
-        { asset: 'coral_red.svg', leftPct: 85, bottomPct: 6, widthPx: 90 },
-        { asset: 'coral_pink.svg', leftPct: 93, bottomPct: 6, widthPx: 68 },
+        { asset: 'seaweed_green.webp', leftPct: 2, bottomPct: 8, widthPx: 42 },
+        { asset: 'coral_red.webp', leftPct: 12, bottomPct: 7, widthPx: 52 },
+        { asset: 'coral_purple.webp', leftPct: 22, bottomPct: 7, widthPx: 54 },
+        { asset: 'starfish.webp', leftPct: 32, bottomPct: 7, widthPx: 40 },
+        { asset: 'giant_clam.webp', leftPct: 43, bottomPct: 6, widthPx: 58 },
+        { asset: 'sea_fan.webp', leftPct: 53, bottomPct: 7, widthPx: 58 },
+        { asset: 'coral_pink.webp', leftPct: 63, bottomPct: 7, widthPx: 56 },
+        { asset: 'starfish.webp', leftPct: 68, bottomPct: 12, widthPx: 32 },
+        { asset: 'pearl.webp', leftPct: 72, bottomPct: 6, widthPx: 32 },
+        { asset: 'anemone.webp', leftPct: 81, bottomPct: 7, widthPx: 46 },
+        { asset: 'sea_urchin.webp', leftPct: 91, bottomPct: 7, widthPx: 42 },
     ],
     bubbleDensity: 0.45,
+    waterColor: '#ddf4fa',
 };
 
-const DEEP_SEA: TankThemeInfo = {
-    name: TankTheme.deepSea,
-    backgroundUrl: (uri) => `${uri}/backgrounds/deep-sea/background-light.svg`,
+const DEEP_OCEAN: TankThemeInfo = {
+    name: TankTheme.deepOcean,
+    backgroundUrl: (uri) => `${uri}/backgrounds/deep-ocean/background.webp`,
+    // The painted abyss already has a sea-pen, coral, sea-whip, two anemones, a
+    // starfish and a sea cucumber, so foreground props stay minimal and dark:
+    // two sea urchins (the only tonally-matched sprite) in the empty mid-floor.
+    // The bright sea_fan was dropped — it clashed with the muted palette.
     decorations: [
-        { asset: 'seaweed_green.svg', leftPct: 10, bottomPct: 6, widthPx: 44 },
-        { asset: 'pearl.svg', leftPct: 26, bottomPct: 6, widthPx: 22 },
-        { asset: 'seaweed_green.svg', leftPct: 42, bottomPct: 6, widthPx: 40 },
-        { asset: 'starfish.svg', leftPct: 56, bottomPct: 6, widthPx: 30 },
-        { asset: 'pearl.svg', leftPct: 68, bottomPct: 6, widthPx: 20 },
-        { asset: 'seaweed_green.svg', leftPct: 84, bottomPct: 6, widthPx: 44 },
+        { asset: 'sea_urchin.webp', leftPct: 42, bottomPct: 7, widthPx: 48 },
+        { asset: 'sea_urchin.webp', leftPct: 55, bottomPct: 7, widthPx: 34 },
     ],
     bubbleDensity: 0.3,
+    waterColor: '#7996df',
 };
 
 const SUNKEN_SHIP: TankThemeInfo = {
     name: TankTheme.sunkenShip,
-    backgroundUrl: (uri) =>
-        `${uri}/backgrounds/sunken-ship/background-light.svg`,
+    backgroundUrl: (uri) => `${uri}/backgrounds/sunken-ship/background.webp`,
+    // Wreck is the centrepiece, so props cluster naturally on the sand to either
+    // side at varied heights rather than in an even row: debris spilled by the
+    // bow on the left (seaweed, anchor, starfish, chest), sea life on the right
+    // (coral at the mound, urchin, seaweed, pearl) staggered in depth. The wreck
+    // itself is left uncluttered.
     decorations: [
-        { asset: 'seaweed_green.svg', leftPct: 8, bottomPct: 6, widthPx: 40 },
-        { asset: 'treasure_chest.svg', leftPct: 20, bottomPct: 6, widthPx: 64 },
-        { asset: 'sunken_ship.svg', leftPct: 36, bottomPct: 4, widthPx: 240 },
-        { asset: 'pearl.svg', leftPct: 74, bottomPct: 6, widthPx: 22 },
-        { asset: 'seaweed_green.svg', leftPct: 84, bottomPct: 6, widthPx: 42 },
-        { asset: 'starfish.svg', leftPct: 92, bottomPct: 6, widthPx: 30 },
+        { asset: 'seaweed_green.webp', leftPct: 5, bottomPct: 9, widthPx: 44 },
+        { asset: 'anchor.webp', leftPct: 14, bottomPct: 5, widthPx: 64 },
+        { asset: 'starfish.webp', leftPct: 23, bottomPct: 12, widthPx: 32 },
+        {
+            asset: 'treasure_chest.webp',
+            leftPct: 29,
+            bottomPct: 6,
+            widthPx: 74,
+        },
+        { asset: 'coral_red.webp', leftPct: 69, bottomPct: 9, widthPx: 52 },
+        { asset: 'sea_urchin.webp', leftPct: 76, bottomPct: 6, widthPx: 44 },
+        {
+            asset: 'seaweed_green.webp',
+            leftPct: 82,
+            bottomPct: 12,
+            widthPx: 40,
+        },
+        { asset: 'pearl.webp', leftPct: 88, bottomPct: 7, widthPx: 30 },
     ],
     bubbleDensity: 0.4,
+    waterColor: '#799cb0',
 };
 
 const REGISTRY: Record<TankTheme, TankThemeInfo> = {
     [TankTheme.coralReef]: CORAL_REEF,
-    [TankTheme.deepSea]: DEEP_SEA,
+    [TankTheme.deepOcean]: DEEP_OCEAN,
     [TankTheme.sunkenShip]: SUNKEN_SHIP,
 };
 
