@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.0.6
+
+- The Aquarium status bar button now opens the tank instead of adding a fish (new Open Aquarium command).
+
 ## 0.0.5
 
 - Redrew the three tank backdrops (coral reef, sunken ship, deep ocean) as full painted underwater scenes - real ocean water up top fading to a sand/seabed floor - and removed the stray corner sparkle from each.
