@@ -74,6 +74,12 @@ async function ensurePanel(
         await viewProvider?.whenReady(3000);
         return viewProvider?.isReady() ? viewProvider : undefined;
     }
+    return createPanel(context);
+}
+
+// Create the editor panel, or reveal it if one already exists. Used in
+// `position: panel` mode - createOrShow brings an existing panel forward.
+function createPanel(context: vscode.ExtensionContext): AquariumPanel {
     return AquariumPanel.createOrShow(
         context.extensionUri,
         getConfiguredSpecies(),
@@ -86,6 +92,20 @@ async function ensurePanel(
         getFishChatter(),
         buildMessageHandler(),
     );
+}
+
+// Open (reveal) the aquarium. Unlike ensurePanel, this always brings the
+// view forward even when it already exists: in explorer mode it focuses the
+// sidebar view (revealing it when collapsed), in panel mode createPanel
+// reveals the existing editor panel. Backs the status bar button.
+async function revealAquarium(context: vscode.ExtensionContext): Promise<void> {
+    if (getConfiguredPosition() === ExtPosition.explorer) {
+        await vscode.commands.executeCommand(
+            `${AquariumViewProvider.viewType}.focus`,
+        );
+        return;
+    }
+    createPanel(context);
 }
 
 // Latest live stats reported by the webview sim, keyed by fish name. Roll
@@ -347,6 +367,7 @@ function registerCommands(context: vscode.ExtensionContext): void {
     const dispose = (cmd: string, fn: (...args: unknown[]) => unknown) => {
         context.subscriptions.push(vscode.commands.registerCommand(cmd, fn));
     };
+    dispose('codeAquarium.open', () => revealAquarium(context));
     dispose('codeAquarium.add-fish', () => addFishFlow(context));
     dispose('codeAquarium.feed', async () => {
         // A randomized handful of food (5-12 pellets) on every click.
@@ -435,8 +456,8 @@ function createStatusBar(context: vscode.ExtensionContext): void {
         100,
     );
     statusBarItem.text = '$(snowflake) Aquarium';
-    statusBarItem.tooltip = vscode.l10n.t('Add a fish to your aquarium');
-    statusBarItem.command = 'codeAquarium.add-fish';
+    statusBarItem.tooltip = vscode.l10n.t('Open your aquarium');
+    statusBarItem.command = 'codeAquarium.open';
     statusBarItem.show();
     context.subscriptions.push(statusBarItem);
 }
